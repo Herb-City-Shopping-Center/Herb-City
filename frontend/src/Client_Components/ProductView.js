@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 import CssBaseline from "@mui/material/CssBaseline";
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
@@ -13,11 +13,10 @@ import Typography from "@mui/material/Typography";
 import { Avatar } from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
 import Button from "@mui/material/Button";
-import LocalMallIcon from '@mui/icons-material/LocalMall';
+import LocalMallIcon from "@mui/icons-material/LocalMall";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import IconButton from "@mui/material/IconButton";
-
-
+import { useHistory } from "react-router-dom";
 
 const sections = [
   { title: "Home", url: "/" },
@@ -25,12 +24,19 @@ const sections = [
   { title: "Orders", url: "#" },
 ];
 
-
-
 const theme = createTheme();
 function ProductView(props) {
-
+  const history = useHistory();
   const data = props.history.location.state?.data;
+
+  const checkOut = () => {
+    history.push({
+      pathname: "/product/checkout",
+      state: {
+        data: data,
+      },
+    });
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -79,7 +85,7 @@ function ProductView(props) {
                   <Button
                     variant="contained"
                     color="success"
-                    // onClick={publish}
+                    onClick={checkOut}
                     sx={{ width: "100%" }}
                   >
                     Buy
@@ -108,4 +114,4 @@ function ProductView(props) {
   );
 }
 
-export default ProductView
+export default ProductView;
