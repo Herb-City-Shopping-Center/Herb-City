@@ -5,6 +5,12 @@ const cors = require("cors");
 const app = express();
 require("dotenv").config({ path: "./config.env" });
 const shopRoutes = require("./routes/shopRoutes");
+const checkOutRoutes = require("./routes/checkOutRoutes");
+
+// const stripe = require("stripe")(
+//   "sk_test_51MzLbqLBzkmE9gXzZVdaGPJdv1IUo6wwxNcdQ58ZCg0zB0KPTIhlHcK7sWZexzIEKe4bYmofn8Ol2FBNCN9PHDDh003zlR5NGI"
+// );
+
 
 const connectDB = require("./DB/db");
 const { errorHandler, notFound } = require("./middleware/errorMiddleware");
@@ -13,8 +19,10 @@ connectDB();
 
 const PORT = process.env.PORT || 5000;
 
+
 app.use(cors());
 app.use(express.json());
+app.use(express.static("public"));
 
 app.get("/", (req, res) => {
   res.send("Api is running");
@@ -29,7 +37,12 @@ if (server) {
 }
 
 
+
+const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
+
+
 app.use("/api/shop", shopRoutes);
+app.use("/payment", checkOutRoutes);
 
 app.use(errorHandler);
 app.use(notFound);

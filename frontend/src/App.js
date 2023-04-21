@@ -18,6 +18,10 @@ import SellerOrders from "./Seller_Components/SellerOrders";
 import SellerShop from './Seller_Components/SellerShop';
 import SellerProducts from './Seller_Components/SellerProducts';
 import ProductView from "./Client_Components/ProductView";
+import Checkout from './Client_Components/orderCheckout/Checkout';
+import Stripe from "./Client_Components/orderCheckout/Stripe";
+import PaymentForm from "./Client_Components/orderCheckout/PaymentForm";
+import Review from "./Client_Components/orderCheckout/Review";
 
 const clerkPubKey = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY;
 
@@ -29,6 +33,7 @@ function App() {
         <Route path="/product/view" component={ProductView} exact />
 
         <SignedIn>
+          <Route path="/product/checkout" component={Checkout} exact />
           <Route path="/seller/dashboard" component={SellerDashboard} exact />
           <Route path="/seller/orders" component={SellerOrders} exact />
           <Route path="/seller/shop" component={SellerShop} exact />
