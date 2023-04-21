@@ -1,12 +1,11 @@
 import "./App.css";
 import { Route } from "react-router-dom";
 
-import AdminDashboard from "./pages/Dashboard";
-import Blog from "./Client_Components/Blog";
-import GuideDashboard from "./Guide/GuideDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
+import HomePage from "./pages/HomePage";
+import SellerDashboard from "./pages/SellerDashboard";
+
 import {
-
-
   ClerkProvider,
   SignedIn,
   SignedOut,
@@ -15,6 +14,10 @@ import {
   SignIn,
   UserButton,
 } from "@clerk/clerk-react";
+import SellerOrders from "./Seller_Components/SellerOrders";
+import SellerShop from './Seller_Components/SellerShop';
+import SellerProducts from './Seller_Components/SellerProducts';
+import ProductView from "./Client_Components/ProductView";
 
 const clerkPubKey = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY;
 
@@ -22,16 +25,20 @@ function App() {
   return (
     <div className="App">
       <ClerkProvider publishableKey={clerkPubKey}>
-        <Route path="/" component={Blog} exact />
+        <Route path="/" component={HomePage} exact />
+        <Route path="/product/view" component={ProductView} exact />
 
         <SignedIn>
-          <Route path="/guide/dashboard" component={GuideDashboard} exact />
+          <Route path="/seller/dashboard" component={SellerDashboard} exact />
+          <Route path="/seller/orders" component={SellerOrders} exact />
+          <Route path="/seller/shop" component={SellerShop} exact />
+          <Route path="/seller/products" component={SellerProducts} exact />
           <Route path="/admin" component={AdminDashboard} exact />
         </SignedIn>
 
-        {/* <SignedOut>
+        <SignedOut>
           <RedirectToSignIn />
-        </SignedOut> */}
+        </SignedOut>
       </ClerkProvider>
     </div>
   );
