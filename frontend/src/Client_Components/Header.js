@@ -12,6 +12,8 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { normalizeWithDefaultValue } from "@clerk/clerk-react/dist/utils";
 import TextField from "@mui/material/TextField";
+import Grid from "@mui/material/Grid";
+import Tooltip from "@mui/material/Tooltip";
 
 function Header(props) {
   const apiKey = "3165db4e8f07bee4f2d90aab6ae05729";
@@ -48,6 +50,10 @@ function Header(props) {
     history.push("/sign-up");
   };
 
+  const toSeller = ()=>{
+    history.push("/seller/dashboard");
+  }
+
   return (
     <React.Fragment>
       <Toolbar
@@ -56,7 +62,11 @@ function Header(props) {
           borderColor: "divider",
         }}
       >
-        {weatherData ? <h5>Temp : {weatherData.main.temp}</h5> : <h5>Loading...</h5>}
+        {weatherData ? (
+          <h5>Temp : {weatherData.main.temp}</h5>
+        ) : (
+          <h5>Loading...</h5>
+        )}
 
         <Typography
           component="h2"
@@ -70,7 +80,32 @@ function Header(props) {
         </Typography>
 
         {user ? (
-          <UserButton />
+          <div>
+            <Grid container>
+              <Grid item xs={10}>
+                <Tooltip title="To selling" placement="top-end">
+                  <Typography
+                    component="h6"
+                    variant="p"
+                    color="inherit"
+                    align="center"
+                    sx={{ display: "flex", fontSize: 12, mt:1 }}
+                    onClick={toSeller}
+                  >
+                    <a href="#">
+                      <u>Selling</u>
+                    </a>
+                  </Typography>
+                </Tooltip>
+              </Grid>
+
+              <Grid item xs={2}>
+                <Tooltip title="User Account" placement="top-end">
+                  <UserButton />
+                </Tooltip>
+              </Grid>
+            </Grid>
+          </div>
         ) : (
           <Button variant="outlined" size="small" onClick={toGuide}>
             Signup/Signin

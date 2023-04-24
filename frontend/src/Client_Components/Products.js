@@ -19,6 +19,9 @@ import ReadMoreIcon from "@mui/icons-material/ReadMore";
 import { useState, useEffect } from "react";
 import ProductView from "./ProductView";
 import { useHistory } from "react-router-dom";
+import Button from "@mui/material/Button";
+import Tooltip from "@mui/material/Tooltip";
+import InfoIcon from "@mui/icons-material/Info";
 
 
 
@@ -28,7 +31,6 @@ export default function Products(props) {
   const { product } = props;
 
   const toProductView = () => {
-    //alert(product.stock);
    
     history.push({
       pathname: "/product/view",
@@ -40,13 +42,16 @@ export default function Products(props) {
 
     return (
       <Grid item xs={12} md={4}>
+
         <Card sx={{ maxWidth: 345 }}>
           <CardMedia
             component="img"
             height="194"
-            image="https://source.unsplash.com/random"
+            image={product.pic}
             alt="Paella dish"
+            onClick={toProductView}
           />
+
           <CardContent>
             <Typography
               variant="body2"
@@ -78,8 +83,23 @@ export default function Products(props) {
 
           <CardActions disableSpacing>
             <IconButton aria-label="add to favorites">
-              <FavoriteIcon onClick={toProductView} />
+              <FavoriteIcon />
             </IconButton>
+
+            <Tooltip title="See more details" placement="top-end">
+
+              <Button
+                variant="outlined"
+                startIcon={<InfoIcon />}
+                sx={{ marginLeft: "50px" }}
+                onClick={toProductView}
+              >
+
+                View Product
+                
+              </Button>
+
+            </Tooltip>
           </CardActions>
         </Card>
       </Grid>

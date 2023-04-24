@@ -205,17 +205,9 @@ export default function Products() {
     }
 
     if (isSuccess) {
-      console.log(
-        productTitle,
-        category.code,
-        description,
-        stock,
-        shopId,
-        pic,
-        price
-      );
 
       const categoryName = category.code;
+      
       try {
         const config = {
           headers: {
@@ -223,7 +215,7 @@ export default function Products() {
           },
         };
         const { data } = await axios.post(
-          "http://localhost:5000/api/shop/addProduct",
+          "http://localhost:5000/api/product/addProduct",
           {
             productTitle,
             categoryName,

@@ -1,46 +1,58 @@
-{
-    "coord": {
-        "lon": 80.0024,
-        "lat": 6.844
-    },
-    "weather": [
-        {
-            "id": 803,
-            "main": "Clouds",
-            "description": "broken clouds",
-            "icon": "04d"
-        }
-    ],
-    "base": "stations",
-    "main": {
-        "temp": 32.86,
-        "feels_like": 39.86,
-        "temp_min": 32.86,
-        "temp_max": 32.86,
-        "pressure": 1005,
-        "humidity": 62,
-        "sea_level": 1005,
-        "grnd_level": 1001
-    },
-    "visibility": 10000,
-    "wind": {
-        "speed": 4.58,
-        "deg": 241,
-        "gust": 4.76
-    },
-    "clouds": {
-        "all": 73
-    },
-    "dt": 1681980099,
-    "sys": {
-        "type": 1,
-        "id": 9098,
-        "country": "LK",
-        "sunrise": 1681950594,
-        "sunset": 1681994865
-    },
-    "timezone": 19800,
-    "id": 1243936,
-    "name": "Homagama",
-    "cod": 200
-}
+const orderData = {
+      "fname": fname,
+      "lname": lname,
+      "addressLine1": addressLine1,
+      "addressLine2": addressLine2,
+      "city": city,
+      "state": state,
+      "zip": zip,
+      "country": country,
+      "quantity": quantity,
+      "productId": productId,
+      "shopId": shopId,
+      "customerId": customerId,
+      "deliverMethod": deliverMethod,
+      "unitPrice": unitPrice,
+      "total": total,
+      "title": title,
+      "pic": pic,
+    };
+
+    !fname ||
+      !lname ||
+      !addressLine1 ||
+      !addressLine2 ||
+      !city ||
+      !state ||
+      !zip ||
+      !country ||
+      !quantity ||
+      !deliveryMethod ||
+      !unitPrice ||
+      !total ||
+      !title ||
+      !pic ||
+      !deliveryMethod||
+      !deliverMethod
+
+      user ? setCustomerId(userId) : setCustomerId(null);
+
+    setQuantity(data.qty);
+    setProductId(data._id);
+    setShopId(data.shopId);
+    setUnitPrice(data.price);
+    setTotal(Number(data.price) * Number(data.qty));
+    setTitle(data.productTitle);
+    setPic(data.pic);
+
+    const deliverMethod = deliveryMethod.code;
+    const methodCost = deliveryMethod.cost;
+
+    setTotal(Number(data.price) * Number(data.qty) + Number(methodCost));
+
+    history.push({
+            pathname: url,
+            state: {
+              data: orderData,
+            },
+          });

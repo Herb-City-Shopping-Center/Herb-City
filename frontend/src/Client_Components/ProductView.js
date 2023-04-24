@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import CssBaseline from "@mui/material/CssBaseline";
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
@@ -17,6 +17,8 @@ import LocalMallIcon from "@mui/icons-material/LocalMall";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import IconButton from "@mui/material/IconButton";
 import { useHistory } from "react-router-dom";
+import TextField from "@mui/material/TextField";
+import Swal from "sweetalert2";
 
 const sections = [
   { title: "Home", url: "/" },
@@ -25,17 +27,56 @@ const sections = [
 ];
 
 const theme = createTheme();
+
 function ProductView(props) {
+
   const history = useHistory();
   const data = props.history.location.state?.data;
 
+  console.log(data);
+
+  const [quantity, setQuantity] = useState();
+
   const checkOut = () => {
-    history.push({
-      pathname: "/product/checkout",
-      state: {
-        data: data,
-      },
-    });
+    var isSuccess = true;
+    if (!quantity) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Please enter quantity",
+        footer: '<a href="">Why do I have this issue?</a>',
+      });
+      isSuccess = false;
+    }
+    if (quantity <= 0) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Quantity must greater than 0",
+        footer: '<a href="">Why do I have this issue?</a>',
+      });
+      isSuccess = false;
+    }
+    if (quantity > Number(data.stock)) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Item stock is not enough",
+        footer: '<a href="">Why do I have this issue?</a>',
+      });
+      isSuccess = false;
+    }
+
+    if (isSuccess) {
+
+      data.qty = quantity;
+      history.push({
+        pathname: "/product/checkout",
+        state: {
+          data: data,
+        },
+      });
+    }
   };
 
   return (
@@ -51,11 +92,13 @@ function ProductView(props) {
           sx={{ maxHeight: "70vh", marginTop: "20px" }}
         >
           <Grid item md={5}>
+
             <Avatar
               src={data.pic ? data.pic : null}
               sx={{ width: "400px", height: "400px", marginLeft: "30px" }}
               variant="square"
             ></Avatar>
+            
           </Grid>
           <Grid item md={7}>
             <h3 style={{ textAlign: "left", display: "flex" }}>
@@ -70,7 +113,7 @@ function ProductView(props) {
               <u>Description</u>
             </h5>
 
-            <p>{data.description}</p>
+            <p style={{ display: "flex" }}>{data.description}</p>
 
             <h5 style={{ textAlign: "left", display: "flex" }}>
               Unit Price : {data.price}
@@ -78,6 +121,18 @@ function ProductView(props) {
             <h5 style={{ textAlign: "left", display: "flex" }}>
               Stock : {data.stock} pcs
             </h5>
+
+            <TextField
+              id="standard-number"
+              label="Quantity"
+              type="number"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              variant="standard"
+              sx={{ marginRight: "500px" }}
+              onChange={(e) => setQuantity(e.target.value)}
+            />
 
             <Grid container spacing={2} sx={{ marginTop: "80px" }}>
               <Grid item xs={6}>

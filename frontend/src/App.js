@@ -31,16 +31,16 @@ function App() {
       <ClerkProvider publishableKey={clerkPubKey}>
         <Route path="/" component={HomePage} exact />
         <Route path="/product/view" component={ProductView} exact />
-
         <SignedIn>
           <Route path="/product/checkout" component={Checkout} exact />
           <Route path="/seller/dashboard" component={SellerDashboard} exact />
           <Route path="/seller/orders" component={SellerOrders} exact />
+          <Route path="/order/review" component={Review} exact />
           <Route path="/seller/shop" component={SellerShop} exact />
           <Route path="/seller/products" component={SellerProducts} exact />
           <Route path="/admin" component={AdminDashboard} exact />
         </SignedIn>
-
+        
         <SignedOut>
           <RedirectToSignIn />
         </SignedOut>
