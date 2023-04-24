@@ -20,7 +20,10 @@ import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
-
+import Swal from "sweetalert2";
+import axios from "axios";
+import { useAuth,useUser } from "@clerk/clerk-react";
+import Autocomplete from "@mui/material/Autocomplete";
 
 
 
@@ -30,12 +33,25 @@ const sections = [
   { title: "Orders", url: "#" },
 ];
 
+const deliveryMethods = [
+  { label: "DHL", code: "DHL", cost: 1000 },
+  { label: "Aramex", code: "Aramex", cost: 800 },
+  { label: "UPS", code: "UPS", cost: 1200 },
+  { label: "Pronto", code: "Pronto", cost: 500 },
+  { label: "DomEx", code: "DomEx", cost: 800 },
+];
+
 const theme = createTheme();
 
 export default function Checkout(props) {
 
+    const { userId, actor } = useAuth();
+      const { user } = useUser();
+
+
   const history = useHistory();
   const data = props.history.location.state?.data;
+  console.log(data);
 
   const [fname, setFname] = useState(null);
   const [lname, setLname] = useState(null);
@@ -45,6 +61,16 @@ export default function Checkout(props) {
   const [state, setState] = useState(null);
   const [zip, setZip] = useState(null);
   const [country, setCountry] = useState(null);
+  const [quantity, setQuantity] = useState(data.qty);
+  const [productId, setProductId] = useState(data._id);
+  const [shopId, setShopId] = useState(data.shopId);
+  const [customerId, setCustomerId] = useState(user?userId:null);
+  const [deliveryMethod, setDeliveryMethod] = useState();
+  const [unitPrice, setUnitPrice] = useState(data.price);
+  const [total, setTotal] = useState(Number(data.price)*Number(data.qty));
+  const [title, setTitle] = useState(data.productTitle);
+  const [pic, setPic] = useState(data.pic);
+
 
   const back =()=>{
      history.push({
@@ -57,30 +83,114 @@ export default function Checkout(props) {
 
   const toPayment = async()=>{
 
-    if(!fname || !lname || !addressLine1 || !addressLine2 || !city || !state || !zip || !country){
-      alert("Please fill all fields");
-    }
-    else{
 
-    fetch("/payment/create-checkout-session", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        items: [data],
-      }),
-    })
-      .then((res) => {
-        if (res.ok) return res.json();
-        return res.json().then((json) => Promise.reject(json));
-      })
-      .then(({ url }) => {
-        window.location = url;
-      })
-      .catch((e) => {
-        console.error(e.error);
+    user ? setCustomerId(userId) : setCustomerId(null);
+
+    setQuantity(data.qty);
+    setProductId(data._id);
+    setShopId(data.shopId);
+    setUnitPrice(data.price);
+    setTotal(Number(data.price) * Number(data.qty));
+    setTitle(data.productTitle);
+    setPic(data.pic);
+
+    const deliverMethod = deliveryMethod.code;
+    const methodCost = deliveryMethod.cost;
+
+    setTotal(Number(data.price) * Number(data.qty) + Number(methodCost));
+
+    const orderData = {
+      "fname": fname,
+      "lname": lname,
+      "addressLine1": addressLine1,
+      "addressLine2": addressLine2,
+      "city": city,
+      "state": state,
+      "zip": zip,
+      "country": country,
+      "quantity": quantity,
+      "productId": productId,
+      "shopId": shopId,
+      "customerId": customerId,
+      "deliverMethod": deliverMethod,
+      "unitPrice": unitPrice,
+      "total": total,
+      "title": title,
+      "pic": pic,
+    };
+
+    if (
+      !fname ||
+      !lname ||
+      !addressLine1 ||
+      !addressLine2 ||
+      !city ||
+      !state ||
+      !zip ||
+      !country ||
+      !quantity ||
+      !deliveryMethod ||
+      !unitPrice ||
+      !total ||
+      !title ||
+      !pic ||
+      !deliveryMethod ||
+      !deliverMethod
+    ) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Please enter required fields",
+        footer: '<a href="">Why do I have this issue?</a>',
       });
+    } else {
+
+      localStorage.setItem("orderInfo", JSON.stringify(orderData));
+      //setUser(JSON.parse(localStorage.getItem("userInfo")));
+
+      fetch("/payment/create-checkout-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          items: [data],
+        }),
+      })
+        .then((res) => {
+          if (res.ok) return res.json();
+          return res.json().then((json) => Promise.reject(json));
+        })
+        .then(({ url }) => {
+
+            window.location = url;  
+
+          // history.push({
+          //   pathname: url,
+          //   state: {
+          //     data: orderData,
+          //   },
+          // });
+
+          // if (url === "http://localhost:3000/") {
+          //   Swal.fire({
+          //     icon: "success",
+          //     title: "Thank you for shopping with Herb-City",
+          //     text: "Order confirmed",
+          //   }).then((result) => {
+          //     if (result.isConfirmed) {
+          //       window.location = url;
+          //     }
+          //   });
+          // }
+          // else{
+          //   console.log("Hello");
+          // } 
+
+        })
+        .catch((e) => {
+          console.error(e.error);
+        });
     }
   }
 
@@ -105,6 +215,7 @@ export default function Checkout(props) {
             <Typography variant="h6" gutterBottom>
               Shipping address
             </Typography>
+
             <Grid container spacing={3}>
               <Grid item xs={12} sm={6}>
                 <TextField
@@ -199,18 +310,41 @@ export default function Checkout(props) {
                   variant="standard"
                 />
               </Grid>
-              
+              <Grid item xs={12} sm={12}>
+
+                <Autocomplete
+                  id="clear-on-escape"
+                  options={deliveryMethods}
+                  clearOnEscape
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Select Delivery Service"
+                      variant="standard"
+                    />
+                  )}
+                  onChange={(event, newValue) => {
+                    setDeliveryMethod(newValue);
+                  }}
+                />
+                
+              </Grid>
             </Grid>
 
             <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-              <Button sx={{ mt: 3, ml: 1 }} onClick={back}>Back</Button>
+              <Button sx={{ mt: 3, ml: 1 }} onClick={back}>
+                Back
+              </Button>
 
-              <Button variant="contained" sx={{ mt: 3, ml: 1 }} onClick={toPayment}>
+              <Button
+                variant="contained"
+                sx={{ mt: 3, ml: 1 }}
+                onClick={toPayment}
+              >
                 Next
-              </Button> 
+              </Button>
             </Box>
           </React.Fragment>
-          
         </Paper>
       </Container>
 

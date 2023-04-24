@@ -1,10 +1,9 @@
-
 const asyncHandler = require("express-async-handler");
+
 const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
 
-
 const checkOut = asyncHandler(async (req, res) => {
-  console.log("jhehej");
+  
   const { data } = req.body;
   try {
     const session = await stripe.checkout.sessions.create({
@@ -20,13 +19,13 @@ const checkOut = asyncHandler(async (req, res) => {
             },
             unit_amount: item.price * 100,
           },
-          quantity: 5,
+          quantity: item.qty,
         };
       }),
       // success_url: `${process.env.CLIENT_URL}/success.html`,
       // cancel_url: `${process.env.CLIENT_URL}/cancel.html`,
-      success_url: "http://localhost:3000/",
-      cancel_url: "http://localhost:3000/admin",
+      success_url: "http://localhost:3000/order/review",
+      cancel_url: "http://localhost:3000/",
     });
     res.json({ url: session.url });
   } catch (e) {

@@ -10,6 +10,11 @@ import Footer from "../Client_Components/Footer";
 import Products from "../Client_Components/Products";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
+import Swal from "sweetalert2";
+import axios from "axios";
+import { useState, useEffect } from "react";
+
+
 
 
 
@@ -31,79 +36,39 @@ const mainFeaturedPost = {
   linkText: "Continue reading…",
 };
 
-const products = [
-  {
-    _id: "6441b08f78c8c9251b778964",
-    productTitle: "Featured post",
-    categoryName: "Nov 12",
-    description:
-      "This is a wider card with supporting text below as a natural lead-in to additional content.",
-    image: "https://source.unsplash.com/random",
-    stock: "10",
-    shopId: "111111111",
-    ratings: ["Good", "nice"],
-    price: "550.00",
-    pic: "http://res.cloudinary.com/cake-lounge/image/upload/v1682026619/xlwkyyrp3r9pxfsh1gwh.jpg",
-  },
-  {
-    _id: "6441b08f78c8c9251b778964",
-    productTitle: "Featured post",
-    categoryName: "Nov 12",
-    description:
-      "This is a wider card with supporting text below as a natural lead-in to additional content.",
-    image: "https://source.unsplash.com/random",
-    stock: "20",
-    shopId: "111111111",
-    ratings: ["Good", "nice"],
-    price: "550.00",
-    pic: "http://res.cloudinary.com/cake-lounge/image/upload/v1682026619/xlwkyyrp3r9pxfsh1gwh.jpg",
-  },
-  {
-    _id: "6441b08f78c8c9251b778964",
-    productTitle: "Featured post",
-    categoryName: "Nov 12",
-    description:
-      "This is a wider card with supporting text below as a natural lead-in to additional content.",
-    image: "https://source.unsplash.com/random",
-    stock: "30",
-    shopId: "111111111",
-    ratings: ["Good", "nice"],
-    price: "550.00",
-    pic: "http://res.cloudinary.com/cake-lounge/image/upload/v1682026619/xlwkyyrp3r9pxfsh1gwh.jpg",
-  },
-  {
-    _id: "6441b08f78c8c9251b778964",
-    productTitle: "Featured post",
-    categoryName: "Nov 12",
-    description:
-      "This is a wider card with supporting text below as a natural lead-in to additional content.",
-    image: "https://source.unsplash.com/random",
-    stock: "40",
-    shopId: "111111111",
-    ratings: ["Good", "nice"],
-    price: "550.00",
-    pic: "http://res.cloudinary.com/cake-lounge/image/upload/v1682026619/xlwkyyrp3r9pxfsh1gwh.jpg",
-  },
-  {
-    _id: "6441b08f78c8c9251b778964",
-    productTitle: "Featured post",
-    categoryName: "Nov 12",
-    description:
-      "This is a wider card with supporting text below as a natural lead-in to additional content.",
-    image: "https://source.unsplash.com/random",
-    stock: "50",
-    shopId: "111111111",
-    ratings: ["Good", "nice"],
-    price: "550.00",
-    pic: "http://res.cloudinary.com/cake-lounge/image/upload/v1682026619/xlwkyyrp3r9pxfsh1gwh.jpg",
-  },
-];
 
 
 const theme = createTheme();
 
 export default function Blog() {
 
+  const [products, setProducts] = useState([])
+
+  const getAllProducts = async () => {
+    try {
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+        },
+      };
+      const { data } = await axios.post(
+        "http://localhost:5000/api/product/getAllProducts",{
+          
+        },
+        config
+      );
+      
+      setProducts(data);
+      console.log(products);
+    } catch (error) {
+      console.log(error.response.data.error);
+    }
+  };
+
+  useEffect(() => {
+    getAllProducts();
+  }, []);
+  
 
   return (
     <ThemeProvider theme={theme}>
@@ -134,12 +99,15 @@ export default function Blog() {
           </Toolbar>
 
           <Grid container spacing={4}>
-            {products.map((product) => (
-              <Products
-                key={product.productTitle}
-                product={product}
-              />
-            ))}
+            {products.Products ? (
+              
+                products.Products.map((product) => (
+                  <Products key={product.productTitle} product={product} />
+                ))
+              
+            ) : (
+              <div>Loading...</div>
+            )}
           </Grid>
         </main>
       </Container>
@@ -150,4 +118,5 @@ export default function Blog() {
       />
     </ThemeProvider>
   );
+              
 }
