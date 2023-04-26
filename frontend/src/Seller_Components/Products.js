@@ -299,7 +299,9 @@ export default function Products() {
     }
     else{
       try {
+        const productId = "123"; // Replace with the actual product ID to be updated
         const { data } = await axios.post("{http://localhost:5000/api/shop/updateProduct}", {
+          productId,
           pic,
           productTitle,
           category,
@@ -317,7 +319,30 @@ export default function Products() {
   };
   const deleteProduct = async (event) => {
     event.preventDefault();
-    alert("deleted");
+  
+    const productId = "123"; // Replace with the actual product ID to be deleted
+  
+    try {
+      const response = await fetch("/api/products", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ _id: productId }),
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Product deleted:", data);
+        // Handle successful deletion
+      } else {
+        console.log("Failed to delete product");
+        // Handle deletion failure
+      }
+    } catch (error) {
+      console.error("Error while deleting product:", error);
+      // Handle deletion error
+    }
   };
 
   if (addProductState && !productUpdateState) {
