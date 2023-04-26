@@ -69,7 +69,7 @@ export default function Products(props) {
               color="text.secondary"
               sx={{ textAlign: "left", display: "flex" }}
             >
-              Unit Price : {product.price}
+              MRP : {product.price}.00 lkr
             </Typography>
 
             <Typography
@@ -82,16 +82,14 @@ export default function Products(props) {
           </CardContent>
 
           <CardActions disableSpacing>
-            <IconButton aria-label="add to favorites">
-              <FavoriteIcon />
-            </IconButton>
+           
 
             <Tooltip title="See more details" placement="top-end">
 
               <Button
                 variant="outlined"
                 startIcon={<InfoIcon />}
-                sx={{ marginLeft: "50px" }}
+                sx={{ marginLeft: "80px" }}
                 onClick={toProductView}
               >
 

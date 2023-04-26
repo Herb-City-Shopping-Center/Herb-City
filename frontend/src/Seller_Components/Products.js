@@ -1,10 +1,4 @@
 import * as React from "react";
-import Link from "@mui/material/Link";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
 import Tooltip from "@mui/material/Tooltip";
 import Button from "@mui/material/Button";
 import Title from "./Title";
@@ -205,9 +199,8 @@ export default function Products() {
     }
 
     if (isSuccess) {
-
       const categoryName = category.code;
-      
+
       try {
         const config = {
           headers: {
@@ -215,7 +208,7 @@ export default function Products() {
           },
         };
         const { data } = await axios.post(
-          "http://localhost:5000/api/product/addProduct",
+          "http://localhost:5000/api/shop/addProduct",
           {
             productTitle,
             categoryName,
