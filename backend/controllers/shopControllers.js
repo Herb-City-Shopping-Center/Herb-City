@@ -158,7 +158,7 @@ const updateProduct = asyncHandler(async (req, res) => {
     _id,
     {
       productTitle: productTitle,
-      categoryName: categoryName,
+      category: category,
       description: description,
       stock: stock,
       pic: pic,
@@ -175,7 +175,7 @@ const updateProduct = asyncHandler(async (req, res) => {
     res.status(201).json({
       _id: updateProduct._id,
       productTitle: updateProduct.productTitle,
-      categoryName: updateProduct.categoryName,
+      category: updateProduct.category,
       description: updateProduct.description,
       stock: updateProduct.stock,
       pic: updateProduct.pic,

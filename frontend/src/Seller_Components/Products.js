@@ -255,6 +255,64 @@ export default function Products() {
   const update = async (event) => {
     event.preventDefault();
     
+    if(!pic){
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "upload a pictue",
+    });
+    }
+    if(!productTitle){
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Fill the product title",
+    });
+    }
+    if(!category){
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Fill the category",
+      });
+    }
+    if(!stock){
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Fill the stock",
+      });
+    }
+    if(!price){
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Fill the price",
+     });
+    }
+    if(!description){
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Fill the description",
+      });
+    }
+    else{
+      try {
+        const { data } = await axios.post("{http://localhost:5000/api/shop/updateProduct}", {
+          pic,
+          productTitle,
+          category,
+          stock,
+          price,
+          description,
+        });
+      } catch (error) {
+        
+      }
+    }
+    
+    
    
   };
   const deleteProduct = async (event) => {
