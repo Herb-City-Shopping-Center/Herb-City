@@ -353,6 +353,9 @@ function ShopRegisterForm() {
     }
 
     if (isSuccess && capcha) {
+
+      console.log(shopImage,shopName,shopDescription,shopAddress);
+
       try {
         const config = {
           headers: {

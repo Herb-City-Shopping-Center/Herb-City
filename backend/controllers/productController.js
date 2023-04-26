@@ -82,7 +82,11 @@ const getAllProducts = asyncHandler(async (req, res) => {
   }
 });
 
+
 module.exports = {
   getAllProducts,
   addProduct,
 };
+
+
+

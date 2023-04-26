@@ -254,7 +254,8 @@ export default function Products() {
 
   const update = async (event) => {
     event.preventDefault();
-    alert("Updated");
+    
+   
   };
   const deleteProduct = async (event) => {
     event.preventDefault();

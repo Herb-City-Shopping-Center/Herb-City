@@ -10,6 +10,8 @@ const registerShop = asyncHandler(async (req, res) => {
   const { userId, shopName, shopDescription, shopAddress, shopImage } =
     req.body;
 
+    console.log(userId, shopName, shopDescription, shopAddress, shopImage);
+
   if (!userId || !shopName || !shopDescription || !shopAddress || !shopImage) {
     res.send(400);
     throw new error("Please enter all the fields!!!");
@@ -100,8 +102,49 @@ const getProductsByShopId = asyncHandler(async(req,res)=>{
 
 });
 
+
+const deleteProduct = asyncHandler(async (req, res) => {
+  //getting user id from body data
+  const { _id } = req.body;
+
+  //check if id is null
+  if (!_id) {
+    console.log("Id is null".red.bold);
+    res.status(400).json({
+      error: "User id is null",
+    });
+    throw new error("Error while deleting shop !!!");
+  } else {
+    try {
+      //find user by id and delete fron database
+      const product = await Product.findOneAndDelete({ _id: _id });
+
+      //send success response message to the frontend
+      if (product) {
+        res.status(201).json({
+          _id: _id,
+        });
+        console.log("Account deleted".red.bold);
+      }
+    } catch (error) {
+      //send error response message to the frontend
+      res.status(400).json({
+        error: "Fail to delete account !!!",
+      });
+      throw new error("Error while deleting shop !!!" + error.message);
+    }
+  }
+});
+
+
+
+
+
 module.exports = {
   getProductsByShopId,
   registerShop,
   getShopByUserId,
+  // updateProduct,
+  deleteProduct,
 };
+

@@ -7,7 +7,7 @@ const shopSchema = mongoose.Schema(
     shopName: { type: "String", required: true },
     shopDescription: { type: "String", required: true },
     shopAddress: { type: "String", required: true },
-    ordersCount: { type: "String", required: true },
+    ordersCount: { type: "String", required: true,default:"0" },
     ratings: [{ type: "String", default: "none" }],
     shopImage: {
       type: "String",
