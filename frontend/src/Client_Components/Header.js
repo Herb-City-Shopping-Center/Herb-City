@@ -24,22 +24,25 @@ function Header(props) {
     "&lang=en&units=metric&APPID=" +
     apiKey;
 
-  var { weatherData, setWeatherData } = useState(null);
+  var [weatherData, setWeatherData ] = useState(null);
 
   const getWeatherData = async () => {
     try {
       const { data } = await axios.post(googleApiUrl);
 
       setWeatherData(data)
+      console.log("--------------------------------------");
       console.log(weatherData);
+      console.log("--------------------------------------");
     } catch (error) {
       console.log("Error fetching weather data");
+      console.log(error);
     }
   };
-
   useEffect(() => {
     getWeatherData();
-  });
+  }, []);
+  
 
   const { user } = useUser();
   const { sections, title } = props;
@@ -63,7 +66,9 @@ function Header(props) {
         }}
       >
         {weatherData ? (
-          <h5>Temp : {weatherData.main.temp}</h5>
+          <div>
+            <h5>Temprature : {weatherData.main.temp} 'C</h5>
+          </div>
         ) : (
           <h5>Loading...</h5>
         )}
@@ -89,7 +94,7 @@ function Header(props) {
                     variant="p"
                     color="inherit"
                     align="center"
-                    sx={{ display: "flex", fontSize: 12, mt:1 }}
+                    sx={{ display: "flex", fontSize: 12, mt: 1 }}
                     onClick={toSeller}
                   >
                     <a href="#">
