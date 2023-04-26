@@ -17,5 +17,6 @@ router.route("/registerShop").post(registerShop);
 router.route("/getShopByUserId").post(getShopByUserId);
 router.route("/getProductsByShopId").post(getProductsByShopId);
 router.route("/deleteProduct").post(deleteProduct);
+router.route("/updateProduct").post(updateProduct);
 
 module.exports = router;

@@ -136,6 +136,64 @@ const deleteProduct = asyncHandler(async (req, res) => {
   }
 });
 
+const updateProduct = asyncHandler(async (req, res) => {
+
+  //getting body data
+  const { _id, productTitle,categoryName, description, stock, pic,price   } = req.body;
+
+  console.log( _id, productTitle,categoryName, description, stock, pic,price);
+
+
+
+  //backend validation for required data
+  if (!productTitle || !categoryName || !description || !stock || !pic || !price || !_id) {
+    res.send(400).json({
+      error: "Please enter all the fields!!!",
+    });
+    throw new error("Please enter all the fields!!!");
+  }
+
+  //find user by id and update given data
+  const updateProduct = await Product.findByIdAndUpdate(
+    _id,
+    {
+      productTitle: productTitle,
+      categoryName: categoryName,
+      description: description,
+      stock: stock,
+      pic: pic,
+      price: price,
+    },
+    {
+      new: true,
+    }
+  );
+
+  //send success response to frontend
+  if (updateProduct) {
+    console.log("Updated!!!".green.bold);
+    res.status(201).json({
+      _id: updateProduct._id,
+      productTitle: updateProduct.productTitle,
+      categoryName: updateProduct.categoryName,
+      description: updateProduct.description,
+      stock: updateProduct.stock,
+      pic: updateProduct.pic,
+      price: updateProduct.price,
+      
+    });
+
+    console.log(updateProduct);
+  } else {
+    //send fail response to frontend
+    res.status(400).json({
+      error: "Update Failed",
+    });
+    throw new error("User not updated !!!");
+  }
+});
+
+
 
 
 
@@ -144,7 +202,7 @@ module.exports = {
   getProductsByShopId,
   registerShop,
   getShopByUserId,
-  // updateProduct,
+  updateProduct,
   deleteProduct,
 };
 
