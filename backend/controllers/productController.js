@@ -62,25 +62,25 @@ const addProduct = asyncHandler(async (req, res) => {
   }
 });
 
-const getAllProducts = asyncHandler(async (req, res) => {
+// const getAllProducts = asyncHandler(async (req, res) => {
 
-  const products = await Product.find();
+//   const products = await Product.find();
 
-  if (products) {
-    console.log("Product fetched!!!".green.bold);
-    //send data to frontend in json format
-    res.status(201).json({
-      Products: products,
-    });
-  } else {
-    console.log("Failed fetch products !!!".red.bold);
-    //send error message to frontend
-    res.status(400).json({
-      error: "Failed to fetch products !!!",
-    });
-    throw new error("Failed to fetch products !!!");
-  }
-});
+//   if (products) {
+//     console.log("Product fetched!!!".green.bold);
+//     //send data to frontend in json format
+//     res.status(201).json({
+//       Products: products,
+//     });
+//   } else {
+//     console.log("Failed fetch products !!!".red.bold);
+//     //send error message to frontend
+//     res.status(400).json({
+//       error: "Failed to fetch products !!!",
+//     });
+//     throw new error("Failed to fetch products !!!");
+//   }
+// });
 
 module.exports = {
   getAllProducts,

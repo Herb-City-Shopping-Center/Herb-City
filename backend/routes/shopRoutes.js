@@ -4,6 +4,7 @@ const {
   registerShop,
   getShopByUserId,
   getProductsByShopId,
+  addProduct,
 } = require("../controllers/shopControllers");
 
 const { protect } = require("../middleware/authMiddleware");
@@ -12,5 +13,6 @@ const { protect } = require("../middleware/authMiddleware");
 router.route("/registerShop").post(registerShop);
 router.route("/getShopByUserId").post(getShopByUserId);
 router.route("/getProductsByShopId").post(getProductsByShopId);
+router.route("/addProduct").post(addProduct);
 
 module.exports = router;

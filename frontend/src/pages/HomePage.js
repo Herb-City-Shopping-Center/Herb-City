@@ -14,13 +14,9 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { useState, useEffect } from "react";
 
-
-
-
-
 const sections = [
   { title: "Home", url: "/" },
-  { title: "Cart", url: "#" },
+  { title: "Cart", url: "/cart" },
   { title: "Orders", url: "#" },
 ];
 
@@ -36,15 +32,17 @@ const mainFeaturedPost = {
   linkText: "Continue reading…",
 };
 
-
-
 const theme = createTheme();
 
-export default function Blog() {
+const UserServiceBaseUrl = process.env.REACT_APP_USER_SERVICE_BASE_URL;
 
-  const [products, setProducts] = useState([])
+export default function Blog() {
+  const [products, setProducts] = useState([]);
 
   const getAllProducts = async () => {
+    console.log("------------------------------");
+    console.log(UserServiceBaseUrl);
+    console.log("------------------------------");
     try {
       const config = {
         headers: {
@@ -52,14 +50,13 @@ export default function Blog() {
         },
       };
       const { data } = await axios.post(
-        "http://localhost:5000/api/product/getAllProducts",{
-          
-        },
+        UserServiceBaseUrl + "/user/getAllProducts",
+        {},
         config
       );
-      
+
       setProducts(data);
-      console.log(products);
+      console.log(data);
     } catch (error) {
       console.log(error.response.data.error);
     }
@@ -68,7 +65,6 @@ export default function Blog() {
   useEffect(() => {
     getAllProducts();
   }, []);
-  
 
   return (
     <ThemeProvider theme={theme}>
@@ -100,11 +96,9 @@ export default function Blog() {
 
           <Grid container spacing={4}>
             {products.Products ? (
-              
-                products.Products.map((product) => (
-                  <Products key={product.productTitle} product={product} />
-                ))
-              
+              products.Products.map((product) => (
+                <Products key={product.productTitle} product={product} />
+              ))
             ) : (
               <div>Loading...</div>
             )}
@@ -118,5 +112,4 @@ export default function Blog() {
       />
     </ThemeProvider>
   );
-              
 }

@@ -15,34 +15,9 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Button from "@mui/material/Button";
 import Swal from "sweetalert2";
 import axios from "axios";
+import { useAuth, useUser } from "@clerk/clerk-react";
 
 
-
-const products = [
-  {
-    name: "Product 1",
-    desc: "A nice thing",
-    price: "$9.99",
-  },
-  {
-    name: "Product 2",
-    desc: "Another thing",
-    price: "$3.45",
-  },
-  {
-    name: "Product 3",
-    desc: "Something else",
-    price: "$6.51",
-  },
-  {
-    name: "Product 4",
-    desc: "Best thing of all",
-    price: "$14.11",
-  },
-  { name: "Shipping", desc: "", price: "Free" },
-];
-
-const addresses = ["1 MUI Drive", "Reactville", "Anytown", "99999", "USA"];
 const payments = [
   { name: "Card type", detail: "Visa" },
   { name: "Card holder", detail: "Mr John Smith" },
@@ -61,69 +36,44 @@ const sections = [
 export default function Review(props) {
 
 
-  const [orderData, setOrderData] = useState();
+  const { userId, actor } = useAuth();
+  const [addressInfo, setAddressInfo] = useState();
+  const [itemsInfo, setItemsInfo] = useState();
+  const [total, setTotal] = useState();
 
   useEffect(() => {
-    setOrderData(JSON.parse(localStorage.getItem("orderInfo")));
+    setItemsInfo(JSON.parse(localStorage.getItem("itemsInfo")));
+    setAddressInfo(JSON.parse(localStorage.getItem("addressInfo")));
 
   }, [])
 
     
   
-  if(!orderData){
-    return(
-      <h3>
-        Loading...
-      </h3>
-    )
-  }
-  else{
- console.log(orderData);
+  if (!addressInfo && !itemsInfo) {
+    return <h3>Loading...</h3>;
+  } else {
+    // console.log(addressInfo);
+    // console.log(itemsInfo);
+
+    for (let i = 0; i < itemsInfo.length; i++) {
+      itemsInfo[i].checkoutDetails = addressInfo;
+
+      if(!itemsInfo[i].customerId){
+         itemsInfo[i].customerId =userId;
+      }
+      // itemsInfo[i].orderTotal = itemsInfo[i].quantity * itemsInfo[i].productPrice;
+    }
+    console.log("Finallllllllllllllllllllllllllllll");
+    console.log(itemsInfo);
 
     const MakeOrder = async (url) => {
 
-      const [fname, setFname] = useState(orderData.fname);
-      const [lname, setLname] = useState(null);
-      const [addressLine1, setAddressLine1] = useState(null);
-      const [addressLine2, setAddressLine2] = useState(null);
-      const [city, setCity] = useState(null);
-      const [state, setState] = useState(null);
-      const [zip, setZip] = useState(null);
-      const [country, setCountry] = useState(null);
-      const [quantity, setQuantity] = useState(null);
-      const [productId, setProductId] = useState(null);
-      const [shopId, setShopId] = useState(null);
-      const [customerId, setCustomerId] = useState(null);
-      const [deliveryMethod, setDeliveryMethod] = useState(null);
-      const [unitPrice, setUnitPrice] = useState(null);
-      const [total, setTotal] = useState(null);
-      const [title, setTitle] = useState(null);
-      const [pic, setPic] = useState(null);
 
-      console.log(orderData);
-
-
-
-      if (
-        !fname ||
-        !lname ||
-        !addressLine1 ||
-        !addressLine2 ||
-        !city ||
-        !state ||
-        !zip ||
-        !country ||
-        !quantity ||
-        !deliveryMethod ||
-        !unitPrice ||
-        !total ||
-        !title ||
-        !pic
-      ) {
+      if (!itemsInfo) {
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: "Please enter required fields",
+          text: "Null Object",
           footer: '<a href="">Why do I have this issue?</a>',
         });
       } else {
@@ -136,26 +86,11 @@ export default function Review(props) {
           const { data } = await axios.post(
             "http://localhost:5000/api/user/placeOrder",
             {
-              fname,
-              lname,
-              addressLine1,
-              addressLine2,
-              city,
-              state,
-              zip,
-              country,
-              quantity,
-              productId,
-              shopId,
-              customerId,
-              deliveryMethod,
-              unitPrice,
-              total,
-              title,
-              pic,
+              itemsInfo,
             },
             config
           );
+          console.log(data);
           Swal.fire({
             icon: "success",
             title: "Thank you for shopping with Herb-City",
@@ -165,7 +100,6 @@ export default function Review(props) {
               window.location = "http://localhost:3000/";
             }
           });
-          console.log(data);
         } catch (error) {
           console.log(error.response.data.error);
 
@@ -200,35 +134,58 @@ export default function Review(props) {
               </Typography>
 
               <Grid container spacing={3}>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={12}>
                   <Typography variant="h6" gutterBottom>
                     Order summary
                   </Typography>
                   <List disablePadding>
-                    {products.map((product) => (
-                      <ListItem key={product.name} sx={{ py: 1, px: 0 }}>
+                    {itemsInfo.map((item) => (
+                      <ListItem key={item.productTitle} sx={{ py: 1, px: 0 }}>
                         <ListItemText
-                          primary={product.name}
-                          secondary={product.desc}
+                          primary={
+                            item.productTitle.length <= 35
+                              ? item.productTitle
+                              : item.productTitle.substr(0, 19) + "..."
+                          }
+                          secondary={
+                            "Ship  by : " + item.checkoutDetails.deliverMethod
+                          }
                         />
-                        <Typography variant="body2">{product.price}</Typography>
+                        <Typography variant="body2">
+                          {item.orderTotal + ".00 lkr"}
+                        </Typography>
                       </ListItem>
                     ))}
 
-                    <ListItem sx={{ py: 1, px: 0 }}>
+                    {/* <ListItem sx={{ py: 1, px: 0 }}>
                       <ListItemText primary="Total" />
                       <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-                        $34.06
                       </Typography>
-                    </ListItem>
+                    </ListItem> */}
                   </List>
+
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={6}>
                       <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
                         Shipping
                       </Typography>
-                      <Typography gutterBottom>John Smith</Typography>
-                      <Typography gutterBottom>{addresses.join(", ")}</Typography>
+                      <Typography gutterBottom>
+                        {itemsInfo[0].checkoutDetails.fname +
+                          " " +
+                          itemsInfo[0].checkoutDetails.lname}
+                      </Typography>
+                      <Typography gutterBottom>
+                        {itemsInfo[0].checkoutDetails.addressLine1}
+                      </Typography>
+                      <Typography gutterBottom>
+                        {itemsInfo[0].checkoutDetails.addressLine2}
+                      </Typography>
+                      <Typography gutterBottom>
+                        {itemsInfo[0].checkoutDetails.city}
+                      </Typography>
+                      <Typography gutterBottom>
+                        {itemsInfo[0].checkoutDetails.state}
+                      </Typography>
                     </Grid>
                     <Grid item container direction="column" xs={12} sm={6}>
                       <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
@@ -238,7 +195,9 @@ export default function Review(props) {
                         {payments.map((payment) => (
                           <React.Fragment key={payment.name}>
                             <Grid item xs={6}>
-                              <Typography gutterBottom>{payment.name}</Typography>
+                              <Typography gutterBottom>
+                                {payment.name}
+                              </Typography>
                             </Grid>
                             <Grid item xs={6}>
                               <Typography gutterBottom>
@@ -253,9 +212,7 @@ export default function Review(props) {
                 </Grid>
               </Grid>
               <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-                <Button sx={{ mt: 3, ml: 1 }} >
-                  Back
-                </Button>
+                <Button sx={{ mt: 3, ml: 1 }}>Back</Button>
 
                 <Button
                   variant="contained"
@@ -275,5 +232,5 @@ export default function Review(props) {
         />
       </ThemeProvider>
     );
-                      }
+  }
 }

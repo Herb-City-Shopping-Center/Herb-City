@@ -29,19 +29,23 @@ import Autocomplete from "@mui/material/Autocomplete";
 
 const sections = [
   { title: "Home", url: "/" },
-  { title: "Cart", url: "#" },
+  { title: "Cart", url: "/cart" },
   { title: "Orders", url: "#" },
 ];
 
 const deliveryMethods = [
-  { label: "DHL", code: "DHL", cost: 1000 },
-  { label: "Aramex", code: "Aramex", cost: 800 },
-  { label: "UPS", code: "UPS", cost: 1200 },
-  { label: "Pronto", code: "Pronto", cost: 500 },
-  { label: "DomEx", code: "DomEx", cost: 800 },
+  { label: "DHL (600.00 lkr per item)", code: "DHL", cost: 600 },
+  { label: "Aramex (500.00 lkr per item)", code: "Aramex", cost: 500 },
+  { label: "UPS (800.00 lkr per item)", code: "UPS", cost: 800 },
+  { label: "Pronto (300.00 lkr per item)", code: "Pronto", cost: 300 },
+  { label: "DomEx (450.00 lkr per item)", code: "DomEx", cost: 450 },
 ];
 
 const theme = createTheme();
+
+
+const CheckoutServiceBaseUrl =
+  process.env.REACT_APP_USER_CHECKOUT_SERVICE_BASE_URL;
 
 export default function Checkout(props) {
 
@@ -61,15 +65,8 @@ export default function Checkout(props) {
   const [state, setState] = useState(null);
   const [zip, setZip] = useState(null);
   const [country, setCountry] = useState(null);
-  const [quantity, setQuantity] = useState(data.qty);
-  const [productId, setProductId] = useState(data._id);
-  const [shopId, setShopId] = useState(data.shopId);
   const [customerId, setCustomerId] = useState(user?userId:null);
   const [deliveryMethod, setDeliveryMethod] = useState();
-  const [unitPrice, setUnitPrice] = useState(data.price);
-  const [total, setTotal] = useState(Number(data.price)*Number(data.qty));
-  const [title, setTitle] = useState(data.productTitle);
-  const [pic, setPic] = useState(data.pic);
 
 
   const back =()=>{
@@ -86,37 +83,52 @@ export default function Checkout(props) {
 
     user ? setCustomerId(userId) : setCustomerId(null);
 
-    setQuantity(data.qty);
-    setProductId(data._id);
-    setShopId(data.shopId);
-    setUnitPrice(data.price);
-    setTotal(Number(data.price) * Number(data.qty));
-    setTitle(data.productTitle);
-    setPic(data.pic);
+    
 
     const deliverMethod = deliveryMethod.code;
-    const methodCost = deliveryMethod.cost;
 
-    setTotal(Number(data.price) * Number(data.qty) + Number(methodCost));
+    var isSuccess = true;
 
-    const orderData = {
-      "fname": fname,
-      "lname": lname,
-      "addressLine1": addressLine1,
-      "addressLine2": addressLine2,
-      "city": city,
-      "state": state,
-      "zip": zip,
-      "country": country,
-      "quantity": quantity,
-      "productId": productId,
-      "shopId": shopId,
-      "customerId": customerId,
-      "deliverMethod": deliverMethod,
-      "unitPrice": unitPrice,
-      "total": total,
-      "title": title,
-      "pic": pic,
+    var deliverCost=0;
+    for (let i = 0; i < data.length; i++) {
+        deliverCost =Number(data[i].quantity) * Number(deliveryMethod.cost);
+
+        data[i].orderTotal =Number(data[i].quantity) * Number(data[i].price);
+
+        if (data[i]._id){
+          data[i].productId = data[i]._id;
+          delete data[i]._id;
+        } 
+
+        if(data[i].productImage){
+          data[i].pic = data[i].productImage;
+          delete data[i].productImage;
+        }
+        if (data[i].productPrice) {
+          data[i].orderTotal=0;
+          data[i].price = data[i].productPrice;
+          delete data[i].productPrice;
+          data[i].orderTotal = Number(data[i].quantity) * Number(data[i].price);
+        }
+        
+
+    } 
+    console.log("-----------------------------------------------------");
+    console.log(deliverCost);
+    console.log("-----------------------------------------------------");
+
+    const addressInfo = {
+      fname: fname,
+      lname: lname,
+      addressLine1: addressLine1,
+      addressLine2: addressLine2,
+      city: city,
+      state: state,
+      zip: zip,
+      country: country,
+      customerId: customerId,
+      deliverMethod: deliverMethod,
+      deliverCost: deliverCost,
     };
 
     if (
@@ -128,14 +140,10 @@ export default function Checkout(props) {
       !state ||
       !zip ||
       !country ||
-      !quantity ||
       !deliveryMethod ||
-      !unitPrice ||
-      !total ||
-      !title ||
-      !pic ||
-      !deliveryMethod ||
-      !deliverMethod
+      !deliverMethod ||
+      !deliverCost ||
+      !isSuccess
     ) {
       Swal.fire({
         icon: "error",
@@ -144,17 +152,17 @@ export default function Checkout(props) {
         footer: '<a href="">Why do I have this issue?</a>',
       });
     } else {
-
-      localStorage.setItem("orderInfo", JSON.stringify(orderData));
+      localStorage.setItem("addressInfo", JSON.stringify(addressInfo));
+      localStorage.setItem("itemsInfo", JSON.stringify(data));
       //setUser(JSON.parse(localStorage.getItem("userInfo")));
 
-      fetch("/payment/create-checkout-session", {
+      fetch(CheckoutServiceBaseUrl+"/payment/create-checkout-session", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          items: [data],
+          items: data,
         }),
       })
         .then((res) => {
@@ -162,33 +170,10 @@ export default function Checkout(props) {
           return res.json().then((json) => Promise.reject(json));
         })
         .then(({ url }) => {
-
-            window.location = url;  
-
-          // history.push({
-          //   pathname: url,
-          //   state: {
-          //     data: orderData,
-          //   },
-          // });
-
-          // if (url === "http://localhost:3000/") {
-          //   Swal.fire({
-          //     icon: "success",
-          //     title: "Thank you for shopping with Herb-City",
-          //     text: "Order confirmed",
-          //   }).then((result) => {
-          //     if (result.isConfirmed) {
-          //       window.location = url;
-          //     }
-          //   });
-          // }
-          // else{
-          //   console.log("Hello");
-          // } 
-
+          window.location = url;
         })
         .catch((e) => {
+          console.log(e);
           console.error(e.error);
         });
     }
