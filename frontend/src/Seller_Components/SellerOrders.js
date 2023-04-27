@@ -21,29 +21,17 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
 import { mainListItems } from "../Seller_Components/listItems";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TablePagination from "@mui/material/TablePagination";
+import TableRow from "@mui/material/TableRow";
+import Avatar from "@mui/material/Avatar";
+import Button from "@mui/material/Button";
 
-import Chart from "../Seller_Components/Chart";
-import Deposits from "../Seller_Components/Deposits";
-import Orders from "./Products";
 import { UserButton, useUser, useSignUp, useAuth } from "@clerk/clerk-react";
-
-function Copyright(props) {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {"Copyright © "}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
 
 const drawerWidth = 240;
 
@@ -91,19 +79,122 @@ const Drawer = styled(MuiDrawer, {
   },
 }));
 
+const columns = [
+  { id: "pic", label: "Image", minWidth: 170 },
+  { id: "productTitle", label: "Product Title", minWidth: 100 },
+  {
+    id: "quantity",
+    label: "Quantity",
+    minWidth: 170,
+    align: "right",
+    format: (value) => value.toLocaleString("en-US"),
+  },
+  {
+    id: "orderTotal",
+    label: "Order Total",
+    minWidth: 170,
+    align: "right",
+    format: (value) => value.toLocaleString("en-US"),
+  },
+  {
+    id: "deliverMethod",
+    label: "Delivery Service",
+    minWidth: 170,
+    align: "right",
+  },
+  {
+    id: "orderTracking",
+    label: "Tracking",
+    minWidth: 170,
+    align: "right",
+  },
+  {
+    id: "orderStatus",
+    label: "Order Status",
+    minWidth: 170,
+    align: "right",
+    format: (value) => value.toFixed(2),
+  },
+];
+
 const mdTheme = createTheme();
 const theme = createTheme();
+
+const SellerServiceBaseUrl = process.env.REACT_APP_SELLER_SERVICE_BASE_URL;
 
 function SellerOrders(props) {
   const { shop } = props;
 
   const [open, setOpen] = React.useState(true);
+  const [viewOrderStatus, setViewOrderStatus] = React.useState(false);
+  const [currentViewOrder, setCurrentViewOrder] = React.useState(null);
+  const [orderStatus, setOrderStatus] = React.useState(false);
+  const [orders, setOrders] = React.useState([]);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [page, setPage] = React.useState(0);
+  const [userShop, setUserShop] = React.useState(
+    JSON.parse(localStorage.getItem("shopInfo"))
+  );
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
+
   const toggleDrawer = () => {
     setOpen(!open);
   };
 
   const { user } = useUser();
   const { userId, actor } = useAuth();
+
+  const viewOrder = (order) => {
+    setViewOrderStatus(true);
+    setCurrentViewOrder(order);
+    if (order.orderStatus === "Completed") {
+      setOrderStatus(true);
+    }
+  };
+
+  function isValidUrl(string) {
+    try {
+      new URL(string);
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  const getProductsByShopId = async () => {
+
+    console.log("-------------------");
+    console.log(userShop);
+    const shopId = userShop._id;
+    try {
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+        },
+      };
+      const { data } = await axios.post(
+        SellerServiceBaseUrl + "/shop/getOrdersByShopId",
+        { shopId },
+        config
+      );
+
+      setOrders(data);
+      console.log(data);
+    } catch (error) {
+      console.log(error.response.data.error);
+    }
+  };
+  useEffect(() => {
+    getProductsByShopId();
+  }, []);
 
   return (
     <ThemeProvider theme={mdTheme}>
@@ -129,8 +220,8 @@ function SellerOrders(props) {
             </IconButton>
             <UserButton />
             {user ? <h3> Hello, {user.firstName}!</h3> : null}
-            {actor && <span>user {actor.sub} has </span>} logged in as user
-            {userId}
+            {/* {actor && <span>user {actor.sub} has </span>} logged in as user
+            {userId} */}
             <Typography
               component="h1"
               variant="h6"
@@ -167,6 +258,102 @@ function SellerOrders(props) {
             {secondaryListItems} */}
           </List>
         </Drawer>
+
+        {/* Orders */}
+
+        <Container sx={{ marginTop: "15vh" }}>
+          <Paper sx={{ width: "100%", overflow: "hidden" }}>
+            <TableContainer sx={{ maxHeight: 440 }}>
+              <Table stickyHeader aria-label="sticky table">
+                <TableHead>
+                  <TableRow>
+                    {columns.map((column) => (
+                      <TableCell
+                        key={column.id}
+                        align={column.align}
+                        style={{ minWidth: column.minWidth }}
+                      >
+                        {column.label}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {orders.map((order) => {
+                    return (
+                      <TableRow
+                        hover
+                        role="checkbox"
+                        tabIndex={-1}
+                        key={order.code}
+                        onClick={() => viewOrder(order)}
+                      >
+                        {columns.map((column) => {
+                          var value = order[column.id];
+                          if (order.checkoutDetails[column.id]) {
+                            value = order.checkoutDetails[column.id];
+                            return (
+                              <TableCell key={column.id} align={column.align}>
+                                {isValidUrl(value) ? (
+                                  <Avatar
+                                    variant="square"
+                                    src={value}
+                                    sx={{ width: "80px", height: "80px" }}
+                                  ></Avatar>
+                                ) : (
+                                  value
+                                )}
+                              </TableCell>
+                            );
+                          } else if (order[column.id] === "Pending") {
+                            value = order[column.id];
+                            return (
+                              <TableCell key={column.id} align={column.align}>
+                                <Button
+                                  variant="outlined"
+                                  // startIcon={<PendingActionsIcon />}
+                                  sx={{ marginLeft: "80px" }}
+                                  color="error"
+                                  // onClick={() => confirmOrder(order._id)}
+                                >
+                                  {value}
+                                </Button>
+                              </TableCell>
+                            );
+                          } else {
+                            return (
+                              <TableCell key={column.id} align={column.align}>
+                                {isValidUrl(value) ? (
+                                  <Avatar
+                                    variant="square"
+                                    src={value}
+                                    sx={{ width: "80px", height: "80px" }}
+                                  ></Avatar>
+                                ) : (
+                                  value
+                                )}
+                              </TableCell>
+                            );
+                          }
+                        })}
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <TablePagination
+              rowsPerPageOptions={[10, 25, 100]}
+              component="div"
+              count={orders.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+          </Paper>
+        </Container>
+        {/* End of Orders */}
       </Box>
     </ThemeProvider>
   );

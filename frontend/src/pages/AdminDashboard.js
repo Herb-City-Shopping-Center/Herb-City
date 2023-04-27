@@ -124,9 +124,9 @@ function DashboardContent() {
               <MenuIcon />
             </IconButton>
             <UserButton />
-            {user ? <h3> Hello, {user.firstName}!</h3> : null}
-            {actor && <span>user {actor.sub} has </span>} logged in as user
-            {userId}
+            {user ? <h3 style={{marginLeft:"10px"}}> Hello, {user.firstName}!</h3> : null}
+            {/* {actor && <span>user {actor.sub} has </span>} logged in as user
+            {userId} */}
             <Typography
               component="h1"
               variant="h6"
@@ -164,6 +164,7 @@ function DashboardContent() {
           </List>
         </Drawer>
         
+
         <Box
           component="main"
           sx={{
@@ -217,6 +218,7 @@ function DashboardContent() {
           </Container>
         </Box>
       </Box>
+      
     </ThemeProvider>
   );
 }

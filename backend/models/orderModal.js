@@ -22,6 +22,7 @@ const orderSchema = mongoose.Schema(
     price: { type: "String", required: true },
     productTitle: { type: "String", required: true },
     orderStatus: { type: "String", default: "Pending" },
+    orderTracking: { type: "String", default: "0000000" },
     quantity: { type: "String", required: true },
     orderTotal: { type: "Number", required: true },
     shopId: { type: "String", required: true },

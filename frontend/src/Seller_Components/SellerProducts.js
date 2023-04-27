@@ -27,8 +27,6 @@ import Deposits from "../Seller_Components/Deposits";
 import Products from "./Products";
 import { UserButton, useUser, useSignUp, useAuth } from "@clerk/clerk-react";
 
-
-
 function Copyright(props) {
   return (
     <Typography
@@ -131,8 +129,8 @@ function SellerProducts(props) {
             </IconButton>
             <UserButton />
             {user ? <h3> Hello, {user.firstName}!</h3> : null}
-            {actor && <span>user {actor.sub} has </span>} logged in as user
-            {userId}
+            {/* {actor && <span>user {actor.sub} has </span>} logged in as user
+            {userId} */}
             <Typography
               component="h1"
               variant="h6"

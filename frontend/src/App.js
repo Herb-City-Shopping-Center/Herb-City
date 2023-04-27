@@ -37,6 +37,7 @@ function App() {
         <Route path="/product/view" component={ProductView} exact />
 
         <SignedIn>
+          <Route path="/admin" component={AdminDashboard} exact />
           <Route path="/product/checkout" component={Checkout} exact />
           <Route path="/cart" component={Cart} exact />
           <Route path="/seller/dashboard" component={SellerDashboard} exact />
@@ -45,7 +46,6 @@ function App() {
           <Route path="/seller/shop" component={SellerShop} exact />
           <Route path="/orders" component={CustomerOrders} exact />
           <Route path="/seller/products" component={SellerProducts} exact />
-          <Route path="/admin" component={AdminDashboard} exact />
           <Route path="/admin/sellers" component={AdminSellers} exact />
           <Route path="/admin/orders" component={AdminOrders} exact />
         </SignedIn>

@@ -41,6 +41,8 @@ const sections = [
 ];
 const theme = createTheme();
 
+const UserCartServiceBaseUrl = process.env.REACT_APP_USER_CART_SERVICE_BASE_URL;
+
 function Cart() {
 
     const history = useHistory();
@@ -82,7 +84,7 @@ function Cart() {
                },
              };
              const { data } = await axios.post(
-               "http://localhost:5000/api/user/getCartList",
+               UserCartServiceBaseUrl+"/cart/getCartList",
                { customerId },
                config
              );
@@ -107,7 +109,7 @@ function Cart() {
                },
              };
              const { data } = await axios.post(
-               "http://localhost:5000/api/user/removeCartItem",
+               UserCartServiceBaseUrl+"/cart/removeCartItem",
                { id },
                config
              );

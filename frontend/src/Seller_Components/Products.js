@@ -9,7 +9,6 @@ import AddBoxIcon from "@mui/icons-material/AddBox";
 import Box from "@mui/material/Box";
 import { Grid } from "@mui/material";
 import Divider from "@mui/material/Divider";
-import "./Profile.css";
 import SettingsIcon from "@mui/icons-material/Settings";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
@@ -38,7 +37,6 @@ import { red } from "@mui/material/colors";
 import EditIcon from "@mui/icons-material/Edit";
 
 import { useAuth } from "@clerk/clerk-react";
-import EditProduct from "./EditProduct";
 
 // Generate Order Data
 function createData(id, date, name, shipTo, paymentMethod, amount) {
@@ -58,6 +56,9 @@ const categories = [
 function preventDefault(event) {
   event.preventDefault();
 }
+
+const SellerServiceBaseUrl = process.env.REACT_APP_SELLER_SERVICE_BASE_URL;;
+
 
 export default function Products() {
   const { userId, actor } = useAuth();
@@ -118,7 +119,7 @@ export default function Products() {
         },
       };
       const { data } = await axios.post(
-        "/api/shop/getProductsByShopId",
+        SellerServiceBaseUrl+"/shop/getProductsByShopId",
         {
           shopId,
         },
@@ -139,6 +140,14 @@ export default function Products() {
 
   const editProduct = (product) => {
     setCurrentUpdate(product);
+    console.log("-------------------------------");
+    console.log(product);
+    setProductTitle(product.productTitle);
+    setStock(product.stock);
+    setPrice(product.price);
+    setDescription(product.description);
+    setPic(product.pic);
+    setCategory(product.categoryName);
     setProductUpdateState(true);
   };
 
@@ -208,7 +217,7 @@ export default function Products() {
           },
         };
         const { data } = await axios.post(
-          "http://localhost:5000/api/shop/addProduct",
+          SellerServiceBaseUrl+"/shop/addProduct",
           {
             productTitle,
             categoryName,
@@ -245,13 +254,156 @@ export default function Products() {
     }
   };
 
-  const update = async (event) => {
-    event.preventDefault();
-    alert("Updated");
+  const update = async (product) => {
+
+    var _id = product._id;
+
+    if(!category){
+      setCategory(product.categoryName);
+    }
+    
+
+    setUpdateProgress("block");
+    setUpdateBtnOpacity(0.5);
+    var isSuccess = true;
+
+
+    console.log(
+      productTitle,
+      description,
+      stock,
+      price,
+      pic,
+      _id,
+      category
+    );
+    
+    if (
+      !productTitle ||
+      !description ||
+      !stock ||
+      !price ||
+      !pic ||
+      !_id ||
+      !category
+    ) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Please fill all the fields",
+        footer: '<a href="">Why do I have this issue?</a>',
+      });
+      isSuccess = false;
+      setUpdateBtnOpacity(1);
+      setUpdateProgress("none");
+    }
+
+    if (isSuccess) {
+      
+
+      try {
+        const config = {
+          headers: {
+            "Content-type": "application/json",
+          },
+        };
+        const { data } = await axios.post(
+          SellerServiceBaseUrl + "/shop/updateProduct",
+          {
+            _id,
+            productTitle,
+            category,
+            description,
+            stock,
+            pic,
+            price,
+          },
+          config
+        );
+        Swal.fire({
+          icon: "success",
+          title: "Updated",
+          text: "Product updated successfully",
+        });
+        console.log(data);
+        setUpdateProgress("none");
+        setUpdateOpen(true);
+        setUpdateBtnOpacity(1);
+        setAddProductState(false);
+        setProductUpdateState(false);
+        setCurrentUpdate(null);
+        getProductsByShopId();
+      } catch (error) {
+        setUpdateProgress("none");
+        setUpdateFailOpen(true);
+        setUpdateBtnOpacity(1);
+        console.log(error.response.data.error);
+
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: error.response.data.error,
+        });
+      }
+    }
   };
-  const deleteProduct = async (event) => {
-    event.preventDefault();
-    alert("deleted");
+  const deleteProduct = async (id) => {
+
+    if(!id){
+      alert("Id is null");
+    }
+    else{
+    Swal.fire({
+      title: "Are you sure to delete product?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        try {
+        const config = {
+          headers: {
+            "Content-type": "application/json",
+          },
+        };
+        const { data } = axios.post(
+          SellerServiceBaseUrl + "/shop/deleteProduct",
+          {
+            id,
+          },
+          config
+        );
+        Swal.fire({
+          icon: "success",
+          title: "Deleted",
+          text: "Product deleted successfully",
+        });
+        console.log(data);
+        setUpdateProgress("none");
+        setUpdateBtnOpacity(1);
+        setAddProductState(false);
+        setProductUpdateState(false);
+        setCurrentUpdate(null);
+        getProductsByShopId();
+      } catch (error) {
+        setUpdateProgress("none");
+        setUpdateFailOpen(true);
+        setUpdateBtnOpacity(1);
+        console.log(error.response.data.error);
+
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: error.response.data.error,
+        });
+      }
+      }
+    });
+  }
+   
   };
 
   if (addProductState && !productUpdateState) {
@@ -525,7 +677,7 @@ export default function Products() {
                   />
                 )}
                 onChange={(event, newValue) => {
-                  setCategory(newValue);
+                  setCategory(newValue.code);
                 }}
               />
             </Grid>
@@ -611,8 +763,8 @@ export default function Products() {
                   <Button
                     variant="contained"
                     color="success"
-                    onClick={update}
                     sx={{ opacity: updateBtnOpacity, marginLeft: "40px" }}
+                    onClick={() => update(currentUpdate)}
                   >
                     Update Product
                   </Button>
@@ -624,7 +776,7 @@ export default function Products() {
                   <Button
                     variant="contained"
                     color="error"
-                    onClick={deleteProduct}
+                    onClick={()=>deleteProduct(currentUpdate._id)}
                     sx={{ opacity: updateBtnOpacity, marginLeft: "40px" }}
                   >
                     Delete Product

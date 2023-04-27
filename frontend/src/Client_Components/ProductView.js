@@ -32,6 +32,9 @@ const sections = [
 
 const theme = createTheme();
 
+const UserCartServiceBaseUrl = process.env.REACT_APP_USER_CART_SERVICE_BASE_URL;
+
+
 function ProductView(props) {
   const history = useHistory();
   const data = props.history.location.state?.data? props.history.location.state?.data : props;
@@ -143,7 +146,7 @@ function ProductView(props) {
           },
         };
         const { data } = await axios.post(
-          "http://localhost:5000/api/user/addCart",
+          UserCartServiceBaseUrl + "/cart/addCart",
           {
             productId,
             productImage,

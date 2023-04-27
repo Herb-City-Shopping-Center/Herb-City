@@ -109,6 +109,8 @@ const Drawer = styled(MuiDrawer, {
 const mdTheme = createTheme();
 const theme = createTheme();
 
+const SellerServiceBaseUrl = process.env.REACT_APP_SELLER_SERVICE_BASE_URL;;
+
 function DashboardContent(props) {
   const { shop } = props;
 
@@ -144,8 +146,8 @@ function DashboardContent(props) {
             </IconButton>
             <UserButton />
             {user ? <h3> Hello, {user.firstName}!</h3> : null}
-            {actor && <span>user {actor.sub} has </span>} logged in as user
-            {userId}
+            {/* {actor && <span>user {actor.sub} has </span>} logged in as user
+            {userId} */}
             <Typography
               component="h1"
               variant="h6"
@@ -521,6 +523,7 @@ export default function SellerDashboard() {
   const [shop, setShop] = useState(null);
 
   const getShop = async () => {
+    console.log(SellerServiceBaseUrl);
     try {
       const config = {
         headers: {
@@ -528,7 +531,7 @@ export default function SellerDashboard() {
         },
       };
       const { data } = await axios.post(
-        "/api/shop/getShopByUserId",
+        SellerServiceBaseUrl+"/shop/getShopByUserId",
         {
           userId,
         },
@@ -540,14 +543,14 @@ export default function SellerDashboard() {
       localStorage.setItem("shopInfo", JSON.stringify(data));
     } catch (error) {
       console.log("Errorrrr");
-      console.log(error);
+      console.log(error.message);
     }
   };
 
   useEffect(() => {
     getShop();
   }, []);
-  
+
   console.log("shops");
   console.log(shop);
   if (shop) {
