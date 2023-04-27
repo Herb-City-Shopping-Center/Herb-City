@@ -30,7 +30,7 @@ import Autocomplete from "@mui/material/Autocomplete";
 const sections = [
   { title: "Home", url: "/" },
   { title: "Cart", url: "/cart" },
-  { title: "Orders", url: "#" },
+  { title: "Orders", url: "/orders" },
 ];
 
 const deliveryMethods = [

@@ -17,7 +17,7 @@ import { useState, useEffect } from "react";
 const sections = [
   { title: "Home", url: "/" },
   { title: "Cart", url: "/cart" },
-  { title: "Orders", url: "#" },
+  { title: "Orders", url: "/orders" },
 ];
 
 const mainFeaturedPost = {

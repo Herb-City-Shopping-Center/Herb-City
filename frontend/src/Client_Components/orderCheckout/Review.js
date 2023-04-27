@@ -29,8 +29,8 @@ const theme = createTheme();
 
 const sections = [
   { title: "Home", url: "/" },
-  { title: "Cart", url: "#" },
-  { title: "Orders", url: "#" },
+  { title: "Cart", url: "/cart" },
+  { title: "Orders", url: "/orders" },
 ];
 
 export default function Review(props) {

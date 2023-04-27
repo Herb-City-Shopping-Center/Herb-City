@@ -34,57 +34,10 @@ const Item = styled(Paper)(({ theme }) => ({
   maxWidth: 800,
 }));
 
-const items = [
-  {
-    title: "Helloo cg shsy nhsyus nnknjs",
-    mrp: "500",
-    qty: "10",
-  },
-  {
-    title: "Helloo cg shsy nhsyus nnknjs",
-    mrp: "500",
-    qty: "10",
-  },
-  {
-    title: "Helloo cg shsy nhsyus nnknjs",
-    mrp: "500",
-    qty: "10",
-  },
-  {
-    title: "Helloo cg shsy nhsyus nnknjs",
-    mrp: "500",
-    qty: "10",
-  },
-  {
-    title: "Helloo cg shsy nhsyus nnknjs",
-    mrp: "500",
-    qty: "10",
-  },
-  {
-    title: "Helloo cg shsy nhsyus nnknjs",
-    mrp: "500",
-    qty: "10",
-  },
-  {
-    title: "Helloo cg shsy nhsyus nnknjs",
-    mrp: "500",
-    qty: "10",
-  },
-  {
-    title: "Helloo cg shsy nhsyus nnknjs",
-    mrp: "500",
-    qty: "10",
-  },
-  {
-    title: "Helloo cg shsy nhsyus nnknjs",
-    mrp: "500",
-    qty: "10",
-  },
-];
 const sections = [
   { title: "Home", url: "/" },
   { title: "Cart", url: "/cart" },
-  { title: "Orders", url: "#" },
+  { title: "Orders", url: "/orders" },
 ];
 const theme = createTheme();
 

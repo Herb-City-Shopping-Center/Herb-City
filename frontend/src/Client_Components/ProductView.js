@@ -24,22 +24,17 @@ import axios from "axios";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 
-
-
-
 const sections = [
   { title: "Home", url: "/" },
   { title: "Cart", url: "/cart" },
-  { title: "Orders", url: "#" },
+  { title: "Orders", url: "/orders" },
 ];
 
 const theme = createTheme();
 
-
 function ProductView(props) {
-
   const history = useHistory();
-  const data = props.history.location.state?.data;
+  const data = props.history.location.state?.data? props.history.location.state?.data : props;
 
   console.log(data);
 
@@ -48,7 +43,7 @@ function ProductView(props) {
 
   const [quantity, setQuantity] = useState();
 
-  const [productImage,setProductImage] = useState(data.pic);
+  const [productImage, setProductImage] = useState(data.pic);
   const [productTitle, setProductTitle] = useState(data.productTitle);
   const [productId, setProductId] = useState(data._id);
   const [shopId, setShopId] = useState(data.shopId);
@@ -58,10 +53,10 @@ function ProductView(props) {
   const [updateOpen, setUpdateOpen] = React.useState(false);
   const [updateFailOpen, setUpdateFailOpen] = React.useState(false);
   const [cartAdded, setCartAdded] = React.useState(false);
-  const [wishListAdded, setWishListAdded] = React.useState("Click to add wishlist");
+  const [wishListAdded, setWishListAdded] = React.useState(
+    "Click to add wishlist"
+  );
 
-
-  
   const checkOut = () => {
     var isSuccess = true;
     if (!quantity) {
@@ -93,7 +88,6 @@ function ProductView(props) {
     }
 
     if (isSuccess) {
-
       data.quantity = quantity;
       console.log(data);
       history.push({
@@ -113,13 +107,11 @@ function ProductView(props) {
     if (reason === "clickaway") {
       return;
     }
-     setUpdateFailOpen(false);
-     setUpdateOpen(false);
-  }
-  
+    setUpdateFailOpen(false);
+    setUpdateOpen(false);
+  };
 
-  const addWishlist= async()=>{
-
+  const addWishlist = async () => {
     setProductId(data._id);
     setProductImage(data.pic);
     setProductPrice(data.price);
@@ -128,48 +120,52 @@ function ProductView(props) {
     setQuantity(quantity);
     setShopId(data.shopId);
 
-    if(!productImage || !productTitle || !productPrice || !productId || !shopId || !customerId || !quantity){
+    if (
+      !productImage ||
+      !productTitle ||
+      !productPrice ||
+      !productId ||
+      !shopId ||
+      !customerId ||
+      !quantity
+    ) {
       Swal.fire({
         icon: "error",
         title: "Oops...",
         text: "Please enter quantity",
         footer: '<a href="">Why do I have this issue?</a>',
       });
-      
-    }
-    else{
-
+    } else {
       try {
-          const config = {
-            headers: {
-              "Content-type": "application/json",
-            },
-          };
-          const { data } = await axios.post(
-            "http://localhost:5000/api/user/addCart",
-            {
-              productId,
-              productImage,
-              productPrice,
-              productTitle,
-              customerId,
-              shopId,
-              quantity,
-            },
-            config
-          );
-          console.log(data);
-          setUpdateOpen(true);
-          setCartAdded(true);
-          setWishListAdded("Added to wishlist");
-        } catch (error) {
-          console.log(error.response.data.error);
-          setUpdateFailOpen(true);
-          setCartAdded(false);
-        }
+        const config = {
+          headers: {
+            "Content-type": "application/json",
+          },
+        };
+        const { data } = await axios.post(
+          "http://localhost:5000/api/user/addCart",
+          {
+            productId,
+            productImage,
+            productPrice,
+            productTitle,
+            customerId,
+            shopId,
+            quantity,
+          },
+          config
+        );
+        console.log(data);
+        setUpdateOpen(true);
+        setCartAdded(true);
+        setWishListAdded("Added to wishlist");
+      } catch (error) {
+        console.log(error.response.data.error);
+        setUpdateFailOpen(true);
+        setCartAdded(false);
+      }
     }
-    
-  }
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -271,7 +267,7 @@ function ProductView(props) {
                 <Tooltip title={wishListAdded} placement="top-end">
                   <IconButton aria-label="add to favorites">
                     {cartAdded ? (
-                      <FavoriteIcon sx={{color:"red"}} />
+                      <FavoriteIcon sx={{ color: "red" }} />
                     ) : (
                       <FavoriteIcon onClick={addWishlist} />
                     )}
