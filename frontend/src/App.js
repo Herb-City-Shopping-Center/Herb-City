@@ -27,6 +27,10 @@ import Cart from "./Client_Components/Cart";
 const clerkPubKey = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY;
 
 function App() {
+
+  const add=()=>{
+
+  }
   return (
     <div className="App">
       <ClerkProvider publishableKey={clerkPubKey}>
