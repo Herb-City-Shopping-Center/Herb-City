@@ -34,7 +34,7 @@ const theme = createTheme();
 
 function ProductView(props) {
   const history = useHistory();
-  const data = props.history.location.state?.data;
+  const data = props.history.location.state?.data? props.history.location.state?.data : props;
 
   console.log(data);
 
@@ -276,7 +276,6 @@ function ProductView(props) {
               </Grid>
             </Grid>
           </Grid>
-          
         </Grid>
       </Container>
 

@@ -14,6 +14,7 @@ import { normalizeWithDefaultValue } from "@clerk/clerk-react/dist/utils";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
 import Tooltip from "@mui/material/Tooltip";
+import Search from "./Search";
 
 function Header(props) {
   const apiKey = "3165db4e8f07bee4f2d90aab6ae05729";
@@ -24,13 +25,13 @@ function Header(props) {
     "&lang=en&units=metric&APPID=" +
     apiKey;
 
-  var [weatherData, setWeatherData ] = useState(null);
+  var [weatherData, setWeatherData] = useState(null);
 
   const getWeatherData = async () => {
     try {
       const { data } = await axios.post(googleApiUrl);
 
-      setWeatherData(data)
+      setWeatherData(data);
       console.log("--------------------------------------");
       console.log(weatherData);
       console.log("--------------------------------------");
@@ -42,7 +43,6 @@ function Header(props) {
   useEffect(() => {
     getWeatherData();
   }, []);
-  
 
   const { user } = useUser();
   const { sections, title } = props;
@@ -53,9 +53,9 @@ function Header(props) {
     history.push("/sign-up");
   };
 
-  const toSeller = ()=>{
+  const toSeller = () => {
     history.push("/seller/dashboard");
-  }
+  };
 
   return (
     <React.Fragment>
@@ -135,17 +135,10 @@ function Header(props) {
             {section.title}
           </Link>
         ))}
-        <TextField
-          id="standard-search"
-          label="Search product"
-          type="search"
-          variant="standard"
-          sx={{ marginLeft: "40vw", marginTop: "-15px" }}
-        />
-        <IconButton>
-          <SearchIcon sx={{ color: "white" }} />
-        </IconButton>
       </Toolbar>
+      <div style={{ marginLeft: "400px",marginBottom:"10px",display:"flex" }}>
+        <Search />
+      </div>
     </React.Fragment>
   );
 }
