@@ -47,8 +47,6 @@ function Header(props) {
 
   const { user } = useUser();
   const { sections, title } = props;
-  console.log("=======user============");
-  console.log(user);
 
   const history = useHistory();
 

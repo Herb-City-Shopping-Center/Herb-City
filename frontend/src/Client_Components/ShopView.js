@@ -39,6 +39,9 @@ function ShopView(props) {
     const [feedback,setFeedback] = useState(null);
     const [products,setProducts] = useState(null);
 
+    console.log("======Shop id===============");
+    console.log(shopId);
+
     const getShop = async () => {
         try {
           const config = {
@@ -52,7 +55,7 @@ function ShopView(props) {
                 shopId,
             },
     
-            config
+            config,
           );
           console.log(data);
           setShop(data);

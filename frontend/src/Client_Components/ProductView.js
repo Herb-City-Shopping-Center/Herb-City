@@ -156,7 +156,7 @@ function ProductView(props) {
           },
         };
         const { data } = await axios.post(
-          "http://localhost:5000/api/user/addCart",
+          "http://localhost:5002/api/cart/addCart",
           {
             productId,
             productImage,
@@ -173,7 +173,8 @@ function ProductView(props) {
         setCartAdded(true);
         setWishListAdded("Added to wishlist");
       } catch (error) {
-        console.log(error.response.data.error);
+        console.log("Cart errorrrrrrr");
+        console.log(error);
         setUpdateFailOpen(true);
         setCartAdded(false);
       }

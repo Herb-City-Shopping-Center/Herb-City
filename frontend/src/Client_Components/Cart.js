@@ -82,7 +82,7 @@ function Cart() {
                },
              };
              const { data } = await axios.post(
-               "http://localhost:5000/api/user/getCartList",
+               "http://localhost:5002/api/cart/getCartList",
                { customerId },
                config
              );
@@ -107,7 +107,7 @@ function Cart() {
                },
              };
              const { data } = await axios.post(
-               "http://localhost:5000/api/user/removeCartItem",
+               "http://localhost:5002/api/cart/removeCartItem",
                { id },
                config
              );
