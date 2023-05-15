@@ -530,28 +530,18 @@ export default function SellerDashboard() {
         },
       };
       const { data } = await axios.post(
-<<<<<<< Updated upstream
-        "/api/shop/getShopByUserId",
-=======
         "http://localhost:6000/api/shop/getShopByUserId",
->>>>>>> Stashed changes
         {
           userId,
         },
-
-        config
+        config,
       );
       console.log(data);
       setShop(data);
       localStorage.setItem("shopInfo", JSON.stringify(data));
     } catch (error) {
-<<<<<<< Updated upstream
-      console.log("Errorrrr");
-      console.log(error);
-=======
       console.log("Error while getting shop");
       console.log(error.message);
->>>>>>> Stashed changes
     }
   };
 
