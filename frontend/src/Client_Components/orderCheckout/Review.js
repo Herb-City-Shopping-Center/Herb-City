@@ -37,9 +37,15 @@ export default function Review(props) {
 
 
   const { userId, actor } = useAuth();
+  const { user } = useUser();
+
   const [addressInfo, setAddressInfo] = useState();
   const [itemsInfo, setItemsInfo] = useState();
   const [total, setTotal] = useState();
+
+  const [userEmail,setUserEmail] = useState(user.primaryEmailAddress.emailAddress)
+  const [subject,setSubject] = useState("Herb-City Order Confirmation");
+  const [message,setMessage] = useState("Thank you for shopping with herb city.Your order is preparing by seller and it will deliver you as soon as possible");
 
   useEffect(() => {
     setItemsInfo(JSON.parse(localStorage.getItem("itemsInfo")));
@@ -91,6 +97,7 @@ export default function Review(props) {
             config
           );
           console.log(data);
+          sendEmail();
           Swal.fire({
             icon: "success",
             title: "Thank you for shopping with Herb-City",
@@ -105,10 +112,35 @@ export default function Review(props) {
 
           Swal.fire({
             icon: "error",
-            title: "Failed to placing orderrrr",
+            title: "Failed to placing order",
             text: error.response.data.error,
           });
         }
+      }
+    };
+
+    const sendEmail = async()=>{
+
+      try {
+        const config = {
+          headers: {
+            "Content-type": "application/json",
+          },
+        };
+        const { data } = await axios.post(
+          "http://localhost:5005/api/user/send-email",
+          {
+            userEmail,
+            subject,
+            message,
+          },
+          config
+        );
+        console.log(data);
+        console.log("===========Email sended ================");
+       
+      } catch (error) {
+        console.log(error);
       }
     };
 

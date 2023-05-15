@@ -15,6 +15,7 @@ import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
 import Tooltip from "@mui/material/Tooltip";
 import Search from "./Search";
+import { useClerk } from "@clerk/clerk-react";
 
 function Header(props) {
   const apiKey = "3165db4e8f07bee4f2d90aab6ae05729";
@@ -46,6 +47,8 @@ function Header(props) {
 
   const { user } = useUser();
   const { sections, title } = props;
+  console.log("=======user============");
+  console.log(user);
 
   const history = useHistory();
 
@@ -56,6 +59,7 @@ function Header(props) {
   const toSeller = () => {
     history.push("/seller/dashboard");
   };
+  const clerk = useClerk();
 
   return (
     <React.Fragment>
@@ -97,7 +101,7 @@ function Header(props) {
                     sx={{ display: "flex", fontSize: 12, mt: 1 }}
                     onClick={toSeller}
                   >
-                    <a href="#">
+                    <a href="">
                       <u>Selling</u>
                     </a>
                   </Typography>
@@ -112,7 +116,7 @@ function Header(props) {
             </Grid>
           </div>
         ) : (
-          <Button variant="outlined" size="small" onClick={toGuide}>
+          <Button variant="outlined" size="small" onClick={() => clerk.openSignIn({})}>
             Signup/Signin
           </Button>
         )}

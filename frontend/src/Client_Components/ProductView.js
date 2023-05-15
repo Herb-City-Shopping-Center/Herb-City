@@ -23,6 +23,17 @@ import { useAuth, useUser } from "@clerk/clerk-react";
 import axios from "axios";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
+import { styled } from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import Rating from '@mui/material/Rating';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import ListSubheader from '@mui/material/ListSubheader';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import Chip from '@mui/material/Chip';
+
 
 const sections = [
   { title: "Home", url: "/" },
@@ -56,6 +67,8 @@ function ProductView(props) {
   const [wishListAdded, setWishListAdded] = React.useState(
     "Click to add wishlist"
   );
+  const [rating, setRating] = React.useState(0);
+  const [feedback, setFeedback] = React.useState(null);
 
   const checkOut = () => {
     var isSuccess = true;
@@ -167,6 +180,72 @@ function ProductView(props) {
     }
   };
 
+  const addFeedback = async () =>{
+
+    if (rating==0) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Please add rating",
+        footer: '<a href="">Why do I have this issue?</a>',
+      });
+    }
+    else if (!feedback) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Please add feedback message",
+        footer: '<a href="">Why do I have this issue?</a>',
+      });
+    }
+    else{
+      try {
+        const config = {
+          headers: {
+            "Content-type": "application/json",
+          },
+        };
+        const { data } = await axios.post(
+          "http://localhost:5003/api/user/feedback/add-feedback-product",
+          {
+            productId,
+            feedback,
+          },
+  
+          config
+        );
+        console.log(data);
+        setRating(0);
+        setFeedback("")
+        Swal.fire({
+          icon: "success",
+          title: "Feedback Added",
+          text: "Your feedback has been added to this product",
+          footer: '<a href="">Why do I have this issue?</a>',
+        });
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Ooops...",
+          text: "Your feedback has not added to this product",
+          footer: '<a href="">Why do I have this issue?</a>',
+        });
+        console.log("Error while adding feedback");
+        console.log(error.message);
+      }
+    }
+
+  }
+
+  const viewShop  =async () =>{
+    history.push({
+      pathname: "/shop/view",
+      state: {
+        data: data,
+      },
+    });
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -188,6 +267,10 @@ function ProductView(props) {
           </Grid>
 
           <Grid item md={7}>
+          <div style={{ textAlign: "left", display: "flex" }}>
+          <Button variant="outlined" color="error" onClick={viewShop}>View Shop</Button>
+          </div>
+          
             <h3 style={{ textAlign: "left", display: "flex" }}>
               {data.productTitle}
             </h3>
@@ -195,12 +278,6 @@ function ProductView(props) {
             <p style={{ textAlign: "left", display: "flex" }}>
               Category : {data.categoryName}
             </p>
-
-            <h5 style={{ textAlign: "left", display: "flex" }}>
-              <u>Description</u>
-            </h5>
-
-            <p style={{ display: "flex" }}>{data.description}</p>
 
             <h5 style={{ textAlign: "left", display: "flex" }}>
               MRP : {data.price}.00 lkr
@@ -278,7 +355,93 @@ function ProductView(props) {
           </Grid>
         </Grid>
       </Container>
+      
+      <Container>
+            <h5 style={{ textAlign: "left", display: "flex",fontSize:"20px" }}>
+              <u>Description</u>
+            </h5>
+            <p style={{ display: "flex" }}>{data.description}</p>
+      </Container>
 
+          <Container>
+          <h5 style={{ textAlign: "left", display: "flex",fontSize:"20px" }}>
+              <u>Feedback section</u>
+            </h5>
+          <List
+            sx={{
+              width: '100%',
+              maxWidth: 560,
+              bgcolor: 'background.paper',
+              position: 'relative',
+              overflow: 'auto',
+              maxHeight: 300,
+              '& ul': { padding: 0 },
+            }}
+            subheader={<li />}
+          >
+            {data.ratings.map((rating) => (
+
+                  
+                    <ListItem key={`item-${rating}`}>
+                    <ListItem alignItems="flex-start">
+                    <ListItemAvatar>
+                      <Avatar alt={rating} src="/static/images/avatar/1.jpg" />
+                    </ListItemAvatar>
+                    <ListItemText
+                      primary={<Rating name="read-only" value={3} readOnly />}
+                      secondary={
+                        <React.Fragment>
+                          <Typography
+                            sx={{ display: 'inline' }}
+                            component="span"
+                            variant="body2"
+                            color="text.primary"
+                          >
+                            feedback
+                          </Typography>
+                          {" — "+rating}
+                        </React.Fragment>
+                      }
+                    />
+                    
+                  </ListItem>
+                    </ListItem>
+
+            ))}
+          </List>
+
+            <Box
+              sx={{
+                '& > legend': { mt: 2 },
+                textAlign:"left",
+                display:"grid"
+                
+              }}
+            >
+              <Typography component="legend"><u>Add feedback to product</u></Typography>
+              <Rating
+              name="simple-controlled"
+              value={rating}
+              onChange={(event, newValue) => {
+                setRating(newValue);
+              }}
+              />
+            <TextField
+              id="standard-multiline-static"
+              label="Add Feedback"
+              multiline
+              rows={2}
+              value={feedback}
+              variant="standard"
+              sx={{width:560}}
+              onChange={(e) => setFeedback(e.target.value)}
+            />
+            <Button variant="contained" color="secondary" sx={{width:"200px",marginTop:"20px"}} onClick={addFeedback}>
+            Submit
+          </Button>
+            </Box>
+            
+            </Container>
       <Footer
         title="Footer"
         description="Something here to give the footer a purpose!"

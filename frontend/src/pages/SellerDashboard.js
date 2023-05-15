@@ -360,7 +360,7 @@ function ShopRegisterForm() {
           },
         };
         const { data } = await axios.post(
-          "http://localhost:5000/api/shop/registerShop",
+          "http://localhost:6000/api/shop/registerShop",
           {
             userId,
             shopName,
@@ -386,12 +386,12 @@ function ShopRegisterForm() {
         Swal.fire({
           icon: "error",
           title: "Oops...",
-          text: error.response.data.error,
+          text: "Error while adding shop",
           footer: '<a href="">Why do I have this issue?</a>',
         });
 
-        console.log(`Error occured ${error.response.data.message}`);
-        console.log(error.response);
+        console.log(`Error occured ${error}`);
+       // console.log(error.response);
       }
     }
   };
@@ -519,6 +519,8 @@ export default function SellerDashboard() {
   const { user } = useUser();
   const { userId, actor } = useAuth();
   const [shop, setShop] = useState(null);
+  console.log("User id");
+  console.log(userId);
 
   const getShop = async () => {
     try {
@@ -528,7 +530,11 @@ export default function SellerDashboard() {
         },
       };
       const { data } = await axios.post(
+<<<<<<< Updated upstream
         "/api/shop/getShopByUserId",
+=======
+        "http://localhost:6000/api/shop/getShopByUserId",
+>>>>>>> Stashed changes
         {
           userId,
         },
@@ -539,8 +545,13 @@ export default function SellerDashboard() {
       setShop(data);
       localStorage.setItem("shopInfo", JSON.stringify(data));
     } catch (error) {
+<<<<<<< Updated upstream
       console.log("Errorrrr");
       console.log(error);
+=======
+      console.log("Error while getting shop");
+      console.log(error.message);
+>>>>>>> Stashed changes
     }
   };
 

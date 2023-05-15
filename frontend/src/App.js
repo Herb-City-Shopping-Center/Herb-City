@@ -24,6 +24,12 @@ import PaymentForm from "./Client_Components/orderCheckout/PaymentForm";
 import Review from "./Client_Components/orderCheckout/Review";
 import Cart from "./Client_Components/Cart";
 import CustomerOrders from "./Client_Components/CustomerOrders";
+<<<<<<< Updated upstream
+=======
+import AdminSellers from './Admin_Components/AdminSellers';
+import AdminOrders from './Admin_Components/AdminOrders';
+import ShopView from "./Client_Components/ShopView";
+>>>>>>> Stashed changes
 
 const clerkPubKey = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY;
 
@@ -35,6 +41,7 @@ function App() {
         <Route path="/product/view" component={ProductView} exact />
 
         <SignedIn>
+<<<<<<< Updated upstream
           <Route path="/product/checkout" component={Checkout} exact />
           <Route path="/cart" component={Cart} exact />
           <Route path="/seller/dashboard" component={SellerDashboard} exact />
@@ -44,6 +51,22 @@ function App() {
           <Route path="/orders" component={CustomerOrders} exact />
           <Route path="/seller/products" component={SellerProducts} exact />
           <Route path="/admin" component={AdminDashboard} exact />
+=======
+          <Route path="/admin" component={AdminDashboard} exact />
+          <Route path="/admin/sellers" component={AdminSellers} exact />
+          <Route path="/admin/orders" component={AdminOrders} exact />
+
+          <Route path="/product/checkout" component={Checkout} exact />
+          <Route path="/cart" component={Cart} exact />
+          <Route path="/order/review" component={Review} exact />
+          <Route path="/orders" component={CustomerOrders} exact />
+          <Route path="/shop/view" component={ShopView} exact />
+
+          <Route path="/seller/shop" component={SellerShop} exact />
+          <Route path="/seller/products" component={SellerProducts} exact />
+          <Route path="/seller/dashboard" component={SellerDashboard} exact />
+          <Route path="/seller/orders" component={SellerOrders} exact />
+>>>>>>> Stashed changes
         </SignedIn>
 
         <SignedOut>
