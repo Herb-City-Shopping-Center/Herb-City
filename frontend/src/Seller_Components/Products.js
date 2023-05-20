@@ -124,7 +124,11 @@ export default function Products() {
         },
       };
       const { data } = await axios.post(
+<<<<<<< Updated upstream
         "/api/shop/getProductsByShopId",
+=======
+        "http://localhost:6002/api/shop/getProductsByShopId",
+>>>>>>> Stashed changes
         {
           shopId,
         },
@@ -215,7 +219,11 @@ export default function Products() {
           },
         };
         const { data } = await axios.post(
+<<<<<<< Updated upstream
           "http://localhost:5000/api/product/addProduct",
+=======
+          "http://localhost:6002/api/shop/addProduct",
+>>>>>>> Stashed changes
           {
             productTitle,
             categoryName,
@@ -276,12 +284,63 @@ export default function Products() {
         text: "Fill the category",
       });
     }
+<<<<<<< Updated upstream
     if(!stock){
       Swal.fire({
         icon: "error",
         title: "Oops...",
         text: "Fill the stock",
       });
+=======
+
+    if (isSuccess) {
+      
+
+      try {
+        const config = {
+          headers: {
+            "Content-type": "application/json",
+          },
+        };
+        const { data } = await axios.post(
+          "http://localhost:6002/api/shop/updateProduct",
+          {
+            _id,
+            productTitle,
+            category,
+            description,
+            stock,
+            pic,
+            price,
+          },
+          config
+        );
+        Swal.fire({
+          icon: "success",
+          title: "Updated",
+          text: "Product updated successfully",
+        });
+        console.log(data);
+        setUpdateProgress("none");
+        setUpdateOpen(true);
+        setUpdateBtnOpacity(1);
+        setAddProductState(false);
+        setProductUpdateState(false);
+        setCurrentUpdate(null);
+        getProductsByShopId();
+      } catch (error) {
+        setUpdateProgress("none");
+        setUpdateFailOpen(true);
+        setUpdateBtnOpacity(1);
+        console.log(error.response.data.error);
+
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: error.response.data.error,
+        });
+      }
+>>>>>>> Stashed changes
     }
     if(!price){
       Swal.fire({
@@ -298,6 +357,7 @@ export default function Products() {
       });
     }
     else{
+<<<<<<< Updated upstream
       try {
         const productId = "123"; // Replace with the actual product ID to be updated
         const { data } = await axios.post("{http://localhost:5000/api/shop/updateProduct}", {
@@ -308,6 +368,35 @@ export default function Products() {
           stock,
           price,
           description,
+=======
+    Swal.fire({
+      title: "Are you sure to delete product?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        try {
+        const config = {
+          headers: {
+            "Content-type": "application/json",
+          },
+        };
+        const { data } = axios.post(
+          "http://localhost:6002/api/shop/deleteProduct",
+          {
+            id,
+          },
+          config
+        );
+        Swal.fire({
+          icon: "success",
+          title: "Deleted",
+          text: "Product deleted successfully",
+>>>>>>> Stashed changes
         });
       } catch (error) {
         

@@ -20,12 +20,13 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
-import { mainListItems } from "../Seller_Components/listItems";
+import { mainListItems } from "./listItems";
 
-import Chart from "../Seller_Components/Chart";
-import Deposits from "../Seller_Components/Deposits";
+import Chart from "./Chart";
+import Deposits from "./Deposits";
 import Products from "./Products";
 import { UserButton, useUser, useSignUp, useAuth } from "@clerk/clerk-react";
+import Orders from "./Orders";
 
 function Copyright(props) {
   return (
@@ -94,27 +95,7 @@ const Drawer = styled(MuiDrawer, {
 const mdTheme = createTheme();
 const theme = createTheme();
 
-function SellerShop(props) {
-
-  const [shopDetails, setShopDetails] = useState(null);
-
-  const { user } = useUser();
-  const { userId, actor } = useAuth();
-
-  useEffect(() => {
-    const fetchShopDetails = async () => {
-      try {
-        const response = await axios.post('http://localhost:6002/api/shop/getShopByUserId', {
-          userId
-        });
-        setShopDetails(response.data);
-      } catch (error) {
-        console.error('Error fetching shop details:', error);
-      }
-    };
-
-    fetchShopDetails();
-  }, []);
+function SellerOrdersList(props) {
   const { shop } = props;
 
   const [open, setOpen] = React.useState(true);
@@ -122,7 +103,8 @@ function SellerShop(props) {
     setOpen(!open);
   };
 
- 
+  const { user } = useUser();
+  const { userId, actor } = useAuth();
 
   return (
     <ThemeProvider theme={mdTheme}>
@@ -157,14 +139,8 @@ function SellerShop(props) {
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              Profile
+              Orders
             </Typography>
-
-
-            
-
-
-
             <IconButton color="inherit">
               <Badge badgeContent={4} color="secondary">
                 <NotificationsIcon />
@@ -207,27 +183,22 @@ function SellerShop(props) {
         >
           <Toolbar />
 
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-              {shopDetails ? (
-            <div style={{ width: '650px', backgroundColor: 'lightblue', padding: '20px', borderRadius: '8px' }}>
-              <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-              <h1 style={{ textAlign: 'center', marginBottom: '10px' }}>Shop Profile</h1>
-              <br/>
-                <img src={shopDetails.shopImage} alt="Profile" style={{ width: '250px', height: '250px', objectFit: 'cover', borderRadius: '8px' }} />
-              </div>
-              <h3 style={{ textAlign: 'center', marginBottom: '10px' }}><span className="normal-text">Shop Name</span> : {shopDetails.shopName}</h3>
-              <h3 style={{ textAlign: 'center', marginBottom: '10px' }}><span className="normal-text">Shop Description</span> : {shopDetails.shopDescription}</h3>
-              <h3 style={{ textAlign: 'center' }}><span className="normal-text">Shop Location</span> : {shopDetails.shopAddress}</h3>
-              {/* Render other shop details */}
-            </div>
-      ) : (
-        <div>Loading...</div>
-      )}
-    </div>
+          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+            <Grid container spacing={3}>
+              {/* Recent Orders */}
+              <Grid item xs={12}>
+                <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
+                  <Orders />
+                </Paper>
+              </Grid>
+            </Grid>
+
+            <Copyright sx={{ pt: 4 }} />
+          </Container>
         </Box>
       </Box>
     </ThemeProvider>
   );
 }
 
-export default SellerShop;
+export default SellerOrdersList;

@@ -22,6 +22,14 @@ import Checkout from './Client_Components/orderCheckout/Checkout';
 import Stripe from "./Client_Components/orderCheckout/Stripe";
 import PaymentForm from "./Client_Components/orderCheckout/PaymentForm";
 import Review from "./Client_Components/orderCheckout/Review";
+<<<<<<< Updated upstream
+=======
+import Cart from "./Client_Components/Cart";
+import CustomerOrders from "./Client_Components/CustomerOrders";
+import AdminSellers from './Admin_Components/AdminSellers';
+import AdminOrders from './Admin_Components/AdminOrders';
+import SellerOrdersList from './Seller_Components/sellerOrdersList';
+>>>>>>> Stashed changes
 
 const clerkPubKey = process.env.REACT_APP_CLERK_PUBLISHABLE_KEY;
 
@@ -34,7 +42,7 @@ function App() {
         <SignedIn>
           <Route path="/product/checkout" component={Checkout} exact />
           <Route path="/seller/dashboard" component={SellerDashboard} exact />
-          <Route path="/seller/orders" component={SellerOrders} exact />
+          <Route path="/seller/orders" component={SellerOrdersList} exact />
           <Route path="/order/review" component={Review} exact />
           <Route path="/seller/shop" component={SellerShop} exact />
           <Route path="/seller/products" component={SellerProducts} exact />

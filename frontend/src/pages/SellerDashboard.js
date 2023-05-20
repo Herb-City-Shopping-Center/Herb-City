@@ -363,7 +363,7 @@ function ShopRegisterForm() {
           },
         };
         const { data } = await axios.post(
-          "http://localhost:5000/api/shop/registerShop",
+          "http://localhost:6002/api/shop/registerShop",
           {
             userId,
             shopName,
@@ -411,7 +411,7 @@ function ShopRegisterForm() {
         sx={{
           height: "100vh",
           backgroundImage:
-            "url(https://res.cloudinary.com/cake-lounge/image/upload/v1674501708/surge-global-featured_qyqzmi.jpg)",
+            "url()",
           backgroundRepeat: "no-repeat",
           backgroundColor: (t) =>
             t.palette.mode === "light"
@@ -531,13 +531,18 @@ export default function SellerDashboard() {
         },
       };
       const { data } = await axios.post(
+<<<<<<< Updated upstream
         "/api/shop/getShopByUserId",
+=======
+        "http://localhost:6002/api/shop/getShopByUserId",
+>>>>>>> Stashed changes
         {
           userId,
         },
 
         config
       );
+      console.log("=======getShop=======");
       console.log(data);
       setShop(data);
       localStorage.setItem("shopInfo", JSON.stringify(data));
