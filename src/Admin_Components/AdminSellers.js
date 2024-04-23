@@ -17,10 +17,11 @@ import Link from "@mui/material/Link";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import { useState, useEffect } from "react";
-import axios from "axios";
-import { useHistory } from "react-router-dom";
-import { mainListItems } from "../Seller_Components/listItems";
+import {
+  mainListItems,
+  secondaryListItems,
+} from "./listItems";
+import { UserButton, useUser, useSignUp, useAuth } from "@clerk/clerk-react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -29,9 +30,12 @@ import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import Avatar from "@mui/material/Avatar";
+import Tooltip from "@mui/material/Tooltip";
+import { useEffect } from "react";
+import axios from "axios";
 import Button from "@mui/material/Button";
-
-import { UserButton, useUser, useSignUp, useAuth } from "@clerk/clerk-react";
+import PendingActionsIcon from "@mui/icons-material/PendingActions";
+import Swal from "sweetalert2";
 
 const drawerWidth = 240;
 
@@ -80,61 +84,51 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 const columns = [
-  { id: "pic", label: "Image", minWidth: 170 },
-  { id: "productTitle", label: "Product Title", minWidth: 100 },
+  { id: "userId", label: "Shop Owner Id", minWidth: 170 },
+  { id: "shopImage", label: "Shop Image", minWidth: 100 },
   {
-    id: "quantity",
-    label: "Quantity",
+    id: "shopAddress",
+    label: "Shop Address",
     minWidth: 170,
     align: "right",
     format: (value) => value.toLocaleString("en-US"),
   },
   {
-    id: "orderTotal",
-    label: "Order Total",
+    id: "ordersCount",
+    label: "Orders Count",
     minWidth: 170,
     align: "right",
     format: (value) => value.toLocaleString("en-US"),
   },
   {
-    id: "deliverMethod",
-    label: "Delivery Service",
+    id: "payment",
+    label: "Payment Due",
     minWidth: 170,
     align: "right",
-  },
-  {
-    id: "orderTracking",
-    label: "Tracking",
-    minWidth: 170,
-    align: "right",
-  },
-  {
-    id: "orderStatus",
-    label: "Order Status",
-    minWidth: 170,
-    align: "right",
-    format: (value) => value.toFixed(2),
   },
 ];
 
 const mdTheme = createTheme();
-const theme = createTheme();
+const AdminSellerServiceBaseUrl = process.env.REACT_APP_ADMIN_SELLER_SERVICE_BASE_URL;
 
-const SellerServiceBaseUrl = process.env.REACT_APP_SELLER_SERVICE_BASE_URL;
+function AdminSellers() {
 
-function SellerOrders(props) {
-  const { shop } = props;
-
+// let revenue = 0;
   const [open, setOpen] = React.useState(true);
-  const [viewOrderStatus, setViewOrderStatus] = React.useState(false);
-  const [currentViewOrder, setCurrentViewOrder] = React.useState(null);
-  const [orderStatus, setOrderStatus] = React.useState(false);
-  const [orders, setOrders] = React.useState([]);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [page, setPage] = React.useState(0);
-  const [userShop, setUserShop] = React.useState(
-    JSON.parse(localStorage.getItem("shopInfo"))
-  );
+  const [shops, setShops] = React.useState([]);
+  const [viewShopStatus, setViewShopStatus] = React.useState(false);
+  const [currentViewShop, setCurrentViewShop] = React.useState(null);
+  const [shopStatus, setShopStatus] = React.useState(false);
+  const [revenue, setRevenue] = React.useState(0);
+
+  const toggleDrawer = () => {
+    setOpen(!open);
+  };
+
+  const { user } = useUser();
+  const { userId, actor } = useAuth();
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -144,22 +138,6 @@ function SellerOrders(props) {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
-
-  const toggleDrawer = () => {
-    setOpen(!open);
-  };
-
-  const { user } = useUser();
-  const { userId, actor } = useAuth();
-
-  const viewOrder = (order) => {
-    setViewOrderStatus(true);
-    setCurrentViewOrder(order);
-    if (order.orderStatus === "Completed") {
-      setOrderStatus(true);
-    }
-  };
-
   function isValidUrl(string) {
     try {
       new URL(string);
@@ -168,34 +146,45 @@ function SellerOrders(props) {
       return false;
     }
   }
-
-  const getProductsByShopId = async () => {
-
-    console.log("-------------------");
-    console.log(userShop);
-    const shopId = userShop._id;
-    try {
-      const config = {
-        headers: {
-          "Content-type": "application/json",
-        },
-      };
-      const { data } = await axios.post(
-        SellerServiceBaseUrl + "/shop/getOrdersByShopId",
-        { shopId },
-        config
-      );
-
-      setOrders(data);
-      console.log(data);
-    } catch (error) {
-      console.log(error.response.data.error);
+  const viewSHop = (order) => {
+    setViewShopStatus(true);
+    setCurrentViewShop(order);
+    if (order.orderStatus === "Completed") {
+      setShopStatus(true);
     }
   };
-  useEffect(() => {
-    getProductsByShopId();
-  }, []);
 
+   const getAllShops= async () => {
+     try {
+       const config = {
+         headers: {
+           "Content-type": "application/json",
+         },
+       };
+       const { data } = await axios.post(
+         AdminSellerServiceBaseUrl + "/admin/getAllShops",
+         {},
+         config
+       );
+
+       setShops(data);
+       console.log(data);
+
+       for (let i = 0; i < data.length; i++) {
+         setRevenue(revenue + data[i].payment);
+       }
+
+       console.log("-------------------");
+       console.log(revenue);
+     } catch (error) {
+       console.log(error.response.data.error);
+     }
+   };
+   useEffect(() => {
+     getAllShops();
+   }, []);
+
+   console.log(revenue);
   return (
     <ThemeProvider theme={mdTheme}>
       <Box sx={{ display: "flex" }}>
@@ -219,7 +208,9 @@ function SellerOrders(props) {
               <MenuIcon />
             </IconButton>
             <UserButton />
-            {user ? <h3> Hello, {user.firstName}!</h3> : null}
+            {user ? (
+              <h3 style={{ marginLeft: "10px" }}> Hello, {user.firstName}!</h3>
+            ) : null}
             {/* {actor && <span>user {actor.sub} has </span>} logged in as user
             {userId} */}
             <Typography
@@ -254,14 +245,16 @@ function SellerOrders(props) {
           <Divider />
           <List component="nav">
             {mainListItems}
-            {/* <Divider sx={{ my: 1 }} />
-            {secondaryListItems} */}
+            <Divider sx={{ my: 1 }} />
+            {/* {secondaryListItems} */}
           </List>
         </Drawer>
 
         {/* Orders */}
 
         <Container sx={{ marginTop: "15vh" }}>
+          <h4>Total Revenue : {revenue}</h4>
+
           <Paper sx={{ width: "100%", overflow: "hidden" }}>
             <TableContainer sx={{ maxHeight: 440 }}>
               <Table stickyHeader aria-label="sticky table">
@@ -279,62 +272,30 @@ function SellerOrders(props) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {orders.map((order) => {
+                  {shops.map((shop) => {
                     return (
                       <TableRow
                         hover
                         role="checkbox"
                         tabIndex={-1}
-                        key={order.code}
-                        onClick={() => viewOrder(order)}
+                        key={shop.code}
+                        onClick={() => viewSHop(shop)}
                       >
                         {columns.map((column) => {
-                          var value = order[column.id];
-                          if (order.checkoutDetails[column.id]) {
-                            value = order.checkoutDetails[column.id];
-                            return (
-                              <TableCell key={column.id} align={column.align}>
-                                {isValidUrl(value) ? (
-                                  <Avatar
-                                    variant="square"
-                                    src={value}
-                                    sx={{ width: "80px", height: "80px" }}
-                                  ></Avatar>
-                                ) : (
-                                  value
-                                )}
-                              </TableCell>
-                            );
-                          } else if (order[column.id] === "Pending") {
-                            value = order[column.id];
-                            return (
-                              <TableCell key={column.id} align={column.align}>
-                                <Button
-                                  variant="outlined"
-                                  // startIcon={<PendingActionsIcon />}
-                                  sx={{ marginLeft: "80px" }}
-                                  color="error"
-                                  // onClick={() => confirmOrder(order._id)}
-                                >
-                                  {value}
-                                </Button>
-                              </TableCell>
-                            );
-                          } else {
-                            return (
-                              <TableCell key={column.id} align={column.align}>
-                                {isValidUrl(value) ? (
-                                  <Avatar
-                                    variant="square"
-                                    src={value}
-                                    sx={{ width: "80px", height: "80px" }}
-                                  ></Avatar>
-                                ) : (
-                                  value
-                                )}
-                              </TableCell>
-                            );
-                          }
+                          var value = shop[column.id];
+                          return (
+                            <TableCell key={column.id} align={column.align}>
+                              {isValidUrl(value) ? (
+                                <Avatar
+                                  variant="square"
+                                  src={value}
+                                  sx={{ width: "80px", height: "80px" }}
+                                ></Avatar>
+                              ) : (
+                                value
+                              )}
+                            </TableCell>
+                          );
                         })}
                       </TableRow>
                     );
@@ -345,7 +306,7 @@ function SellerOrders(props) {
             <TablePagination
               rowsPerPageOptions={[10, 25, 100]}
               component="div"
-              count={orders.length}
+              count={shops.length}
               rowsPerPage={rowsPerPage}
               page={page}
               onPageChange={handleChangePage}
@@ -359,4 +320,4 @@ function SellerOrders(props) {
   );
 }
 
-export default SellerOrders;
+export default AdminSellers;

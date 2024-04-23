@@ -2,8 +2,8 @@ import React from 'react'
 import CssBaseline from "@mui/material/CssBaseline";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Container from "@mui/material/Container";
-import Header from "../Client_Components/Header";
-import Footer from "../Client_Components/Footer";
+import Header from "./Header";
+import Footer from "./Footer";
 import Grid from "@mui/material/Grid";
 import './Cart.css';
 import Avatar from '@mui/material/Avatar';

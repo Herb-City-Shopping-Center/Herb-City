@@ -7,7 +7,7 @@ import Grid from "@mui/material/Grid";
 import { useState, useEffect } from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Header from "../Header";
-import Footer from "./../Footer";
+import Footer from "../Footer";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";

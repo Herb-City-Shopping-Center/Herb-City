@@ -15,7 +15,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import PaymentForm from "./PaymentForm";
 import Review from "./Review";
 import Header from "../Header";
-import Footer from './../Footer';
+import Footer from '../Footer';
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import { useState, useEffect } from "react";

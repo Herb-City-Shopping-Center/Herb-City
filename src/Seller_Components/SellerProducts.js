@@ -20,10 +20,10 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
-import { mainListItems } from "../Seller_Components/listItems";
+import { mainListItems } from "./listItems";
 
-import Chart from "../Seller_Components/Chart";
-import Deposits from "../Seller_Components/Deposits";
+import Chart from "./Chart";
+import Deposits from "./Deposits";
 import Products from "./Products";
 import { UserButton, useUser, useSignUp, useAuth } from "@clerk/clerk-react";
 

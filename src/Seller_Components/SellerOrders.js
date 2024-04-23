@@ -17,11 +17,10 @@ import Link from "@mui/material/Link";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import {
-  mainListItems,
-  secondaryListItems,
-} from "../Admin_Components/listItems";
-import { UserButton, useUser, useSignUp, useAuth } from "@clerk/clerk-react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { useHistory } from "react-router-dom";
+import { mainListItems } from "./listItems";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -30,12 +29,9 @@ import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import Avatar from "@mui/material/Avatar";
-import Tooltip from "@mui/material/Tooltip";
-import { useEffect } from "react";
-import axios from "axios";
 import Button from "@mui/material/Button";
-import PendingActionsIcon from "@mui/icons-material/PendingActions";
-import Swal from "sweetalert2";
+
+import { UserButton, useUser, useSignUp, useAuth } from "@clerk/clerk-react";
 
 const drawerWidth = 240;
 
@@ -122,23 +118,23 @@ const columns = [
 ];
 
 const mdTheme = createTheme();
-const AdminServiceBaseUrl = process.env.REACT_APP_ADMIN_SERVICE_BASE_URL;
+const theme = createTheme();
 
-function AdminOrders() {
+const SellerServiceBaseUrl = process.env.REACT_APP_SELLER_SERVICE_BASE_URL;
+
+function SellerOrders(props) {
+  const { shop } = props;
+
   const [open, setOpen] = React.useState(true);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  const [page, setPage] = React.useState(0);
-  const [orders, setOrders] = React.useState([]);
   const [viewOrderStatus, setViewOrderStatus] = React.useState(false);
   const [currentViewOrder, setCurrentViewOrder] = React.useState(null);
   const [orderStatus, setOrderStatus] = React.useState(false);
-
-  const toggleDrawer = () => {
-    setOpen(!open);
-  };
-
-  const { user } = useUser();
-  const { userId, actor } = useAuth();
+  const [orders, setOrders] = React.useState([]);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [page, setPage] = React.useState(0);
+  const [userShop, setUserShop] = React.useState(
+    JSON.parse(localStorage.getItem("shopInfo"))
+  );
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -149,28 +145,12 @@ function AdminOrders() {
     setPage(0);
   };
 
-  const getAllOrders = async () => {
-    try {
-      const config = {
-        headers: {
-          "Content-type": "application/json",
-        },
-      };
-      const { data } = await axios.post(
-        AdminServiceBaseUrl + "/admin/getAllOrders",
-        {},
-        config
-      );
-
-      setOrders(data);
-      console.log(data);
-    } catch (error) {
-      console.log(error.response.data.error);
-    }
+  const toggleDrawer = () => {
+    setOpen(!open);
   };
-  useEffect(() => {
-    getAllOrders();
-  }, []);
+
+  const { user } = useUser();
+  const { userId, actor } = useAuth();
 
   const viewOrder = (order) => {
     setViewOrderStatus(true);
@@ -189,40 +169,32 @@ function AdminOrders() {
     }
   }
 
-  const confirmOrder = async (id) => {
-    Swal.fire({
-      title: "Are you sure to confirm order?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, confirm it!",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        try {
-          const config = {
-            headers: {
-              "Content-type": "application/json",
-            },
-          };
-          const { data } = axios.post(
-            AdminServiceBaseUrl + "/admin/confirmOrder",
-            { id },
-            config
-          );
-          Swal.fire({
-            icon: "success",
-            title: "Order Confirmed",
-            text: "Order has been successfully confirmed",
-          });
-          getAllOrders();
-        } catch (error) {
-          console.log(error.response.data.error);
-        }
-      }
-    });
+  const getProductsByShopId = async () => {
+
+    console.log("-------------------");
+    console.log(userShop);
+    const shopId = userShop._id;
+    try {
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+        },
+      };
+      const { data } = await axios.post(
+        SellerServiceBaseUrl + "/shop/getOrdersByShopId",
+        { shopId },
+        config
+      );
+
+      setOrders(data);
+      console.log(data);
+    } catch (error) {
+      console.log(error.response.data.error);
+    }
   };
+  useEffect(() => {
+    getProductsByShopId();
+  }, []);
 
   return (
     <ThemeProvider theme={mdTheme}>
@@ -247,9 +219,7 @@ function AdminOrders() {
               <MenuIcon />
             </IconButton>
             <UserButton />
-            {user ? (
-              <h3 style={{ marginLeft: "10px" }}> Hello, {user.firstName}!</h3>
-            ) : null}
+            {user ? <h3> Hello, {user.firstName}!</h3> : null}
             {/* {actor && <span>user {actor.sub} has </span>} logged in as user
             {userId} */}
             <Typography
@@ -284,8 +254,8 @@ function AdminOrders() {
           <Divider />
           <List component="nav">
             {mainListItems}
-            <Divider sx={{ my: 1 }} />
-            {/* {secondaryListItems} */}
+            {/* <Divider sx={{ my: 1 }} />
+            {secondaryListItems} */}
           </List>
         </Drawer>
 
@@ -341,10 +311,10 @@ function AdminOrders() {
                               <TableCell key={column.id} align={column.align}>
                                 <Button
                                   variant="outlined"
-                                  startIcon={<PendingActionsIcon />}
+                                  // startIcon={<PendingActionsIcon />}
                                   sx={{ marginLeft: "80px" }}
                                   color="error"
-                                  onClick={() => confirmOrder(order._id)}
+                                  // onClick={() => confirmOrder(order._id)}
                                 >
                                   {value}
                                 </Button>
@@ -389,4 +359,4 @@ function AdminOrders() {
   );
 }
 
-export default AdminOrders;
+export default SellerOrders;

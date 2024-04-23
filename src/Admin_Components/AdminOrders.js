@@ -20,7 +20,7 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import {
   mainListItems,
   secondaryListItems,
-} from "../Admin_Components/listItems";
+} from "./listItems";
 import { UserButton, useUser, useSignUp, useAuth } from "@clerk/clerk-react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -84,44 +84,54 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 const columns = [
-  { id: "userId", label: "Shop Owner Id", minWidth: 170 },
-  { id: "shopImage", label: "Shop Image", minWidth: 100 },
+  { id: "pic", label: "Image", minWidth: 170 },
+  { id: "productTitle", label: "Product Title", minWidth: 100 },
   {
-    id: "shopAddress",
-    label: "Shop Address",
+    id: "quantity",
+    label: "Quantity",
     minWidth: 170,
     align: "right",
     format: (value) => value.toLocaleString("en-US"),
   },
   {
-    id: "ordersCount",
-    label: "Orders Count",
+    id: "orderTotal",
+    label: "Order Total",
     minWidth: 170,
     align: "right",
     format: (value) => value.toLocaleString("en-US"),
   },
   {
-    id: "payment",
-    label: "Payment Due",
+    id: "deliverMethod",
+    label: "Delivery Service",
     minWidth: 170,
     align: "right",
+  },
+  {
+    id: "orderTracking",
+    label: "Tracking",
+    minWidth: 170,
+    align: "right",
+  },
+  {
+    id: "orderStatus",
+    label: "Order Status",
+    minWidth: 170,
+    align: "right",
+    format: (value) => value.toFixed(2),
   },
 ];
 
 const mdTheme = createTheme();
-const AdminSellerServiceBaseUrl = process.env.REACT_APP_ADMIN_SELLER_SERVICE_BASE_URL;
+const AdminServiceBaseUrl = process.env.REACT_APP_ADMIN_SERVICE_BASE_URL;
 
-function AdminSellers() {
-
-// let revenue = 0;
+function AdminOrders() {
   const [open, setOpen] = React.useState(true);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [page, setPage] = React.useState(0);
-  const [shops, setShops] = React.useState([]);
-  const [viewShopStatus, setViewShopStatus] = React.useState(false);
-  const [currentViewShop, setCurrentViewShop] = React.useState(null);
-  const [shopStatus, setShopStatus] = React.useState(false);
-  const [revenue, setRevenue] = React.useState(0);
+  const [orders, setOrders] = React.useState([]);
+  const [viewOrderStatus, setViewOrderStatus] = React.useState(false);
+  const [currentViewOrder, setCurrentViewOrder] = React.useState(null);
+  const [orderStatus, setOrderStatus] = React.useState(false);
 
   const toggleDrawer = () => {
     setOpen(!open);
@@ -138,6 +148,38 @@ function AdminSellers() {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
+
+  const getAllOrders = async () => {
+    try {
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+        },
+      };
+      const { data } = await axios.post(
+        AdminServiceBaseUrl + "/admin/getAllOrders",
+        {},
+        config
+      );
+
+      setOrders(data);
+      console.log(data);
+    } catch (error) {
+      console.log(error.response.data.error);
+    }
+  };
+  useEffect(() => {
+    getAllOrders();
+  }, []);
+
+  const viewOrder = (order) => {
+    setViewOrderStatus(true);
+    setCurrentViewOrder(order);
+    if (order.orderStatus === "Completed") {
+      setOrderStatus(true);
+    }
+  };
+
   function isValidUrl(string) {
     try {
       new URL(string);
@@ -146,45 +188,42 @@ function AdminSellers() {
       return false;
     }
   }
-  const viewSHop = (order) => {
-    setViewShopStatus(true);
-    setCurrentViewShop(order);
-    if (order.orderStatus === "Completed") {
-      setShopStatus(true);
-    }
+
+  const confirmOrder = async (id) => {
+    Swal.fire({
+      title: "Are you sure to confirm order?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, confirm it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        try {
+          const config = {
+            headers: {
+              "Content-type": "application/json",
+            },
+          };
+          const { data } = axios.post(
+            AdminServiceBaseUrl + "/admin/confirmOrder",
+            { id },
+            config
+          );
+          Swal.fire({
+            icon: "success",
+            title: "Order Confirmed",
+            text: "Order has been successfully confirmed",
+          });
+          getAllOrders();
+        } catch (error) {
+          console.log(error.response.data.error);
+        }
+      }
+    });
   };
 
-   const getAllShops= async () => {
-     try {
-       const config = {
-         headers: {
-           "Content-type": "application/json",
-         },
-       };
-       const { data } = await axios.post(
-         AdminSellerServiceBaseUrl + "/admin/getAllShops",
-         {},
-         config
-       );
-
-       setShops(data);
-       console.log(data);
-
-       for (let i = 0; i < data.length; i++) {
-         setRevenue(revenue + data[i].payment);
-       }
-
-       console.log("-------------------");
-       console.log(revenue);
-     } catch (error) {
-       console.log(error.response.data.error);
-     }
-   };
-   useEffect(() => {
-     getAllShops();
-   }, []);
-
-   console.log(revenue);
   return (
     <ThemeProvider theme={mdTheme}>
       <Box sx={{ display: "flex" }}>
@@ -253,8 +292,6 @@ function AdminSellers() {
         {/* Orders */}
 
         <Container sx={{ marginTop: "15vh" }}>
-          <h4>Total Revenue : {revenue}</h4>
-
           <Paper sx={{ width: "100%", overflow: "hidden" }}>
             <TableContainer sx={{ maxHeight: 440 }}>
               <Table stickyHeader aria-label="sticky table">
@@ -272,30 +309,62 @@ function AdminSellers() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {shops.map((shop) => {
+                  {orders.map((order) => {
                     return (
                       <TableRow
                         hover
                         role="checkbox"
                         tabIndex={-1}
-                        key={shop.code}
-                        onClick={() => viewSHop(shop)}
+                        key={order.code}
+                        onClick={() => viewOrder(order)}
                       >
                         {columns.map((column) => {
-                          var value = shop[column.id];
-                          return (
-                            <TableCell key={column.id} align={column.align}>
-                              {isValidUrl(value) ? (
-                                <Avatar
-                                  variant="square"
-                                  src={value}
-                                  sx={{ width: "80px", height: "80px" }}
-                                ></Avatar>
-                              ) : (
-                                value
-                              )}
-                            </TableCell>
-                          );
+                          var value = order[column.id];
+                          if (order.checkoutDetails[column.id]) {
+                            value = order.checkoutDetails[column.id];
+                            return (
+                              <TableCell key={column.id} align={column.align}>
+                                {isValidUrl(value) ? (
+                                  <Avatar
+                                    variant="square"
+                                    src={value}
+                                    sx={{ width: "80px", height: "80px" }}
+                                  ></Avatar>
+                                ) : (
+                                  value
+                                )}
+                              </TableCell>
+                            );
+                          } else if (order[column.id] === "Pending") {
+                            value = order[column.id];
+                            return (
+                              <TableCell key={column.id} align={column.align}>
+                                <Button
+                                  variant="outlined"
+                                  startIcon={<PendingActionsIcon />}
+                                  sx={{ marginLeft: "80px" }}
+                                  color="error"
+                                  onClick={() => confirmOrder(order._id)}
+                                >
+                                  {value}
+                                </Button>
+                              </TableCell>
+                            );
+                          } else {
+                            return (
+                              <TableCell key={column.id} align={column.align}>
+                                {isValidUrl(value) ? (
+                                  <Avatar
+                                    variant="square"
+                                    src={value}
+                                    sx={{ width: "80px", height: "80px" }}
+                                  ></Avatar>
+                                ) : (
+                                  value
+                                )}
+                              </TableCell>
+                            );
+                          }
                         })}
                       </TableRow>
                     );
@@ -306,7 +375,7 @@ function AdminSellers() {
             <TablePagination
               rowsPerPageOptions={[10, 25, 100]}
               component="div"
-              count={shops.length}
+              count={orders.length}
               rowsPerPage={rowsPerPage}
               page={page}
               onPageChange={handleChangePage}
@@ -320,4 +389,4 @@ function AdminSellers() {
   );
 }
 
-export default AdminSellers;
+export default AdminOrders;
