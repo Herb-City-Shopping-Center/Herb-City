@@ -1,13 +1,13 @@
-# Specify the base image
-FROM node:latest
+# Use a lightweight Node.js image
+FROM node:alpine as build
 
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the package.json and package-lock.json files to the container
+# Copy package.json and package-lock.json to the container
 COPY package*.json ./
 
-# Install the dependencies
+# Install dependencies
 RUN npm install --legacy-peer-deps
 
 # Copy the rest of the application code to the container
@@ -16,8 +16,14 @@ COPY . .
 # Build the React app
 RUN npm run build
 
-# Expose the port that the microservice will listen on
-EXPOSE 3000
+# Use nginx as the base image for serving the static files
+FROM nginx:alpine
 
-# Start the microservice
-CMD ["npm", "start"]
+# Copy the built React app to the nginx server directory
+COPY --from=build /app/build /usr/share/nginx/html
+
+# Expose port 80
+EXPOSE 80
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]
