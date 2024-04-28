@@ -1,29 +1,19 @@
-# Use a lightweight Node.js image
-FROM node:alpine as build
+# Use proper node version
+FROM node
 
-# Set the working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json to the container
-COPY package*.json ./
+COPY package.json package.json
+COPY package-lock.json package-lock.json
 
-# Install dependencies
-RUN npm install --legacy-peer-deps
-
-# Copy the rest of the application code to the container
+# Install npm packages, copy rest of the repo and run build command
+RUN npm install --legacy-peer-deps --production
 COPY . .
-
-# Build the React app
 RUN npm run build
 
-# Use nginx as the base image for serving the static files
-FROM nginx:alpine
+# Install Serve to serve static build folder
+RUN npm install -g serve
 
-# Copy the built React app to the nginx server directory
-COPY --from=build /app/build /usr/share/nginx/html
+EXPOSE 3000
 
-# Expose port 80
-EXPOSE 80
-
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+CMD [ "serve", "-s", "build" ]

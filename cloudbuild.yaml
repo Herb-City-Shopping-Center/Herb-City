@@ -1,15 +1,29 @@
 steps:
-# Build the container image
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'us-west2-docker.pkg.dev/herb-city/herb-city-web/herb-city-web-image:tag1', '.']
 
-# Push the image to Artifact Registry
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'us-west2-docker.pkg.dev/herb-city/herb-city-web/herb-city-web-image:tag1']
+# Prints the name of the committed branch
+- id: 'branch name'
+  name: 'alpine'
+  entrypoint: 'sh'  
+  args: 
+  - '-c'
+  - | 
+      echo "***********************"
+      echo "The Commit was made in the branch: "
+      echo "$_BRANCH_NAME"
+      echo "***********************"
 
-# Deploy container image to Cloud Run
-- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-  entrypoint: gcloud
-  args: ['run', 'deploy', 'herb-city-web-image', '--image', 'us-west2-docker.pkg.dev/herb-city/herb-city-web/herb-city-web-image:tag1', '--region', 'us-west2']
-images:
-- 'herb-city-web-image', '--image', 'us-west2-docker.pkg.dev/herb-city/herb-city-web/herb-city-web-image:tag1'
+# Pulls the GCP SDK builder image to run the gcloud commands
+# Builds the image and pushes to the GCR
+#
+- id: 'Build an Image'
+  name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: 'gcloud'
+  args: ['builds', 'submit', '--tag', 'gcr.io/${_PROJECT_ID}/${_SERVICE_NAME}:latest', '.', '--region', '${_BUILD_REGION}']
+
+
+# Deploys the image in region given in trigger
+# Pulls the image from dockerhub
+- id: 'Deploy the Image'
+  name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: 'gcloud'
+  args: ['run', 'deploy', '${_SERVICE_NAME}', '--image', 'gcr.io/${_PROJECT_ID}/${_SERVICE_NAME}:latest', '--region', '${_DEPLOY_REGION}']
